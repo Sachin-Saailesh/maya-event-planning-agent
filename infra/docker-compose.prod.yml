@@ -1,0 +1,56 @@
+version: "3.9"
+
+services:
+  # ── LiveKit Server ──────────────────────────────────────
+  livekit:
+    image: livekit/livekit-server:latest
+    command: --config /etc/livekit.yaml
+    ports:
+      - "7880:7880"
+      - "50000-50100:50000-50100/udp"
+    volumes:
+      - ./livekit.yaml:/etc/livekit.yaml
+    restart: always
+
+  # ── PostgreSQL ──────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: maya
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-maya}
+      POSTGRES_DB: maya
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    restart: always
+
+  # ── Orchestrator ────────────────────────────────────────
+  orchestrator:
+    build:
+      context: ../services/orchestrator
+      dockerfile: ../../infra/Dockerfile.orchestrator
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://maya:${POSTGRES_PASSWORD:-maya}@postgres:5432/maya
+      - LIVEKIT_URL=ws://livekit:7880
+      - LIVEKIT_API_KEY=devkey
+      - LIVEKIT_API_SECRET=secret
+    depends_on:
+      - postgres
+      - livekit
+    restart: always
+
+  # ── Frontend ────────────────────────────────────────────
+  web:
+    build:
+      context: ../apps/web
+    ports:
+      - "3000:80"
+    depends_on:
+      - orchestrator
+    restart: always
+
+volumes:
+  pgdata:

@@ -1,0 +1,8 @@
+openai
+websockets
+python-dotenv
+livekit>=0.18.1
+livekit-api>=0.8.0
+livekit-agents>=1.2.0
+numpy
+ruff
