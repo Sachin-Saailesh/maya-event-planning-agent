@@ -42,15 +42,6 @@ class AgentWorker:
         """Main entry: connect to orchestrator, process audio from existing room."""
         logger.info(f"Starting worker for session {self.session_id}")
 
-        # Connect to orchestrator WS
-        orch_url = f"{self.orchestrator_url}/ws/session/{self.session_id}"
-        try:
-            self._ws = await websockets.connect(orch_url)
-            logger.info("Connected to orchestrator")
-        except Exception as e:
-            logger.error(f"Failed to connect to orchestrator: {e}")
-            return
-
         @self._room.on("track_subscribed")
         def on_track_subscribed(track: rtc.Track, publication: rtc.RemoteTrackPublication, participant: rtc.RemoteParticipant):
             if track.kind == rtc.TrackKind.KIND_AUDIO:
@@ -64,18 +55,34 @@ class AgentWorker:
                     logger.info(f"Found existing audio track from {participant.identity}")
                     asyncio.create_task(self._process_audio_track(track_publication.track))
 
+        # Loop to keep checking orchestrator connection and re-connect if closed
         try:
-            # Notify orchestrator
-            await self._send_event("client.audio.started", {})
-            logger.info("Worker fully connected and listening.")
+            # Notify orchestrator of connection start
+            await self._connect_and_notify()
 
-            # Keep running
+            # Keep running and reconnecting if dev server reloads
             while True:
+                if not self._ws or self._ws.closed:
+                    logger.warning("Orchestrator WS is closed. Attempting reconnect...")
+                    await self._connect_and_notify()
                 await asyncio.sleep(1)
 
         finally:
             if self._ws:
                 await self._ws.close()
+
+    async def _connect_and_notify(self):
+        """Connect to orchestrator and send initial ready event."""
+        orch_url = f"{self.orchestrator_url}/ws/session/{self.session_id}"
+        try:
+            if self._ws:
+                await self._ws.close()
+            self._ws = await websockets.connect(orch_url)
+            logger.info("Connected to orchestrator")
+            await self._send_event("client.audio.started", {})
+            logger.info("Worker fully connected and listening.")
+        except Exception as e:
+            logger.error(f"Failed to connect to orchestrator: {e}")
 
     async def _process_audio_track(self, track: rtc.Track):
         """Process incoming audio track frames."""

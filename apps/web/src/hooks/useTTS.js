@@ -17,6 +17,7 @@ export function useTTS() {
   const speakingRef = useRef(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const audioRef = useRef(null);
+  const generationIdRef = useRef(0);
 
   // Barge-in tracking
   const currentTextRef = useRef('');
@@ -34,10 +35,15 @@ export function useTTS() {
     speakingRef.current = true;
     setIsSpeaking(true);
     currentTextRef.current = text;
+    
+    const currentGen = ++generationIdRef.current;
 
     try {
       const url = `/tts?text=${encodeURIComponent(text)}`;
       const response = await fetch(url);
+
+      // If stopped while fetching, abort this TTS
+      if (currentGen !== generationIdRef.current) return;
 
       if (!response.ok) {
         console.error('[TTS] Backend TTS error:', response.status, await response.text());
@@ -48,6 +54,9 @@ export function useTTS() {
       }
 
       const audioBlob = await response.blob();
+      
+      if (currentGen !== generationIdRef.current) return;
+      
       const audioUrl = URL.createObjectURL(audioBlob);
 
       const audio = new Audio(audioUrl);
@@ -97,6 +106,7 @@ export function useTTS() {
 
   /** Stop playback immediately (barge-in or end session). */
   const stop = useCallback(() => {
+    generationIdRef.current++; // cancel pending fetches
     queueRef.current = [];
     speakingRef.current = false;
     setIsSpeaking(false);

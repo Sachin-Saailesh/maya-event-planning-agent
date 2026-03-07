@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import os
 import sys
+import random
 from typing import Any
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", "packages", "schema"))
@@ -28,62 +29,73 @@ from maya_schema.patches import (
 
 # ── Slot prompts ───────────────────────────────────────────────────
 
-SLOT_PROMPTS: dict[str, str] = {
-    "primary_colors": (
-        "Hi, I am Maya from Neenkal Kettavai, your decoration planning assistant. "
-        "Let's start with the colour palette for the hall. "
-        "What primary colours would you like? For example: gold, maroon, ivory, or warm white."
-    ),
-    "types_of_flowers": (
-        "Lovely choice! Now, what flowers would you like? "
-        "Popular options include jasmine, marigold, roses, orchids, and lilies."
-    ),
-    "entrance_decor.foyer": (
-        "Let's plan the entrance. What kind of foyer decoration would you like? "
-        "For example: floral arch, kolam rangoli, drapes, or lanterns."
-    ),
-    "entrance_decor.garlands": (
-        "What garlands would you like at the entrance? "
-        "Options include mango leaf thoranam, jasmine strings, marigold garlands, or rose garlands."
-    ),
-    "entrance_decor.name_board": (
-        "Would you like a name board at the entrance? "
-        "It can be floral, backlit, wooden, or with LED letters."
-    ),
-    "entrance_decor.top_decor_at_entrance": (
-        "Any top decoration at the entrance? "
-        "For example: drape swags, floral canopy, or hanging installations."
-    ),
-    "backdrop_decor.types": (
-        "Now for the backdrop. You can choose from: flowers, pattern, or flower lights. "
-        "You can pick multiple — just tell me which ones."
-    ),
-    "decor_lights": (
-        "What decorative lighting would you like? "
-        "Options include fairy lights, string lights, candle lights, paper lanterns, or spotlights."
-    ),
-    "chandeliers": (
-        "Would you like chandeliers? "
-        "We have crystal, floral, brass, glass, or beaded chandeliers available."
-    ),
-    "props": (
-        "Any props you'd like in the hall? "
-        "For example: vintage furniture, swing, uruli, temple bells, or banana plants."
-    ),
-    "selfie_booth_decor": (
-        "Would you like a selfie booth? "
-        "We can set it up with a floral frame, neon sign, props wall, or themed backdrop."
-    ),
-    "hall_decor": (
-        "Finally, any additional hall decoration? "
-        "For example: ceiling drapes, pillar wraps, table centrepieces, or aisle runners."
-    ),
+SLOT_PROMPTS: dict[str, list[str]] = {
+    "primary_colors": [
+        "What primary colours would you like for the hall?",
+        "What colour scheme do you have in mind for the hall?",
+        "Could you tell me the main colours you want for the decoration?"
+    ],
+    "types_of_flowers": [
+        "Lovely choice! What flowers would you like?",
+        "Beautiful! Next, what kind of flowers should we use?",
+        "Great colour palette. What type of flowers are you thinking of?"
+    ],
+    "entrance_decor.foyer": [
+        "Let's plan the entrance. What kind of foyer decoration would you like?",
+        "Moving on to the entryway, how would you like the foyer decorated?",
+        "For the entrance foyer, what style are you looking for?"
+    ],
+    "entrance_decor.garlands": [
+        "What garlands would you like at the entrance?",
+        "Should we add some garlands at the entrance?",
+        "Any specific garlands for the entryway?"
+    ],
+    "entrance_decor.name_board": [
+        "Would you like a customised welcome name board?",
+        "How about a welcome name board?",
+        "Do you want a customized name board at the entrance?"
+    ],
+    "entrance_decor.top_decor_at_entrance": [
+        "Any top decoration for the entrance canopy?",
+        "Would you like any decor hanging from the top of the entrance?",
+        "For the top of the entryway, do you prefer a floral canopy or drape swags?"
+    ],
+    "backdrop_decor.types": [
+        "Now for the backdrop. You can choose from flowers, pattern, or flower lights.",
+        "Moving to the stage backdrop, what style catches your eye?",
+        "Let's design the backdrop. Would you prefer flowers, a pattern, or lights?"
+    ],
+    "decor_lights": [
+        "What decorative lighting would you like?",
+        "Lighting sets the mood! Any preference for the decorative lights?",
+        "Any preferences for decorative lights? We can do fairy lights or warm paper lanterns."
+    ],
+    "chandeliers": [
+        "Would you like any hanging chandeliers?",
+        "Should we add chandeliers to the ceiling?",
+        "How about hanging some chandeliers?"
+    ],
+    "props": [
+        "Any traditional props you'd like in the hall? Like an uruli or banana plants?",
+        "Would you like to add some traditional props?",
+        "Do you want any special props around the hall?"
+    ],
+    "selfie_booth_decor": [
+        "Would you like a selfie booth?",
+        "How about a fun selfie booth for the guests?",
+        "Do you want to include a photobooth backdrop?"
+    ],
+    "hall_decor": [
+        "Finally, any additional hall decoration? Like table centrepieces or pillar wraps?",
+        "Is there any extra hall decor you'd like?",
+        "Last but not least, any decorative touches for the rest of the hall?"
+    ],
 }
 
 GREETING = (
-    "Hi, I am Maya from Neenkal Kettavai, your decoration planning assistant. "
-    "I'll help you plan the perfect decoration for your hall. "
-    "Let's start — what primary colours would you like for the decoration?"
+    "Hi, I am Maya. "
+    "I'll help plan the perfect decoration for your hall. "
+    "Let's start — what primary colours would you like?"
 )
 
 COMPLETION_MESSAGE = (
@@ -95,7 +107,12 @@ COMPLETION_MESSAGE = (
 
 def get_slot_prompt(slot: str) -> str:
     """Get Maya's prompt for a given slot."""
-    return SLOT_PROMPTS.get(slot, f"Tell me about your preferences for {slot.replace('_', ' ')}.")
+    prompts = SLOT_PROMPTS.get(slot)
+    if prompts and isinstance(prompts, list):
+        return random.choice(prompts)
+    elif prompts and isinstance(prompts, str):
+        return prompts
+    return f"Tell me about your preferences for {slot.replace('_', ' ')}."
 
 
 def get_greeting() -> str:
@@ -183,6 +200,7 @@ def process_user_input(
     """
     values = parsed["values"]
     intent = parsed["intent"]
+    target_slot = parsed.get("slot", slot)
 
     # Handle greeting
     if intent == "greeting":
@@ -212,6 +230,17 @@ def process_user_input(
             "next_prompt": get_slot_prompt(next_slot) if next_slot else COMPLETION_MESSAGE,
         }
 
+    # Handle acknowledgment / confirmation with no values
+    if intent in ("acknowledgment", "confirm") and not values:
+        return {
+            "patch_ops": [],
+            "confirmation_text": "",
+            "needs_confirmation": False,
+            "confirmation_request": None,
+            "next_slot": slot,
+            "next_prompt": f"Great! So, {get_slot_prompt(slot)}",
+        }
+
     # No values extracted
     if not values:
         return {
@@ -226,7 +255,7 @@ def process_user_input(
         }
 
     # Validate backdrop types
-    if slot == "backdrop_decor.types":
+    if target_slot == "backdrop_decor.types":
         try:
             values = validate_backdrop_types(values)
         except ValueError:
@@ -241,14 +270,19 @@ def process_user_input(
             }
 
     # Check if slot already has values
-    existing = get_nested(state, slot)
+    existing = get_nested(state, target_slot)
     if existing and isinstance(existing, list) and len(existing) > 0:
         # Field has values — needs confirmation
         if intent in ("add", "replace", "remove"):
             # User already specified intent
-            pointer = dotted_to_pointer(slot)
-            ops, conf_text = resolve_confirmation(intent, slot, existing, values, state)
-            next_slot = _advance_slot(state, slot)
+            pointer = dotted_to_pointer(target_slot)
+            ops, conf_text = resolve_confirmation(intent, target_slot, existing, values, state)
+            
+            if target_slot != slot and not slot_is_filled(state, slot):
+                next_slot = slot
+            else:
+                next_slot = _advance_slot(state, slot)
+                
             return {
                 "patch_ops": ops,
                 "confirmation_text": conf_text,
@@ -259,7 +293,7 @@ def process_user_input(
             }
         else:
             # Ask for confirmation
-            conf_req = build_confirmation_request(slot, existing, values)
+            conf_req = build_confirmation_request(target_slot, existing, values)
             return {
                 "patch_ops": [],
                 "confirmation_text": "",
@@ -270,8 +304,8 @@ def process_user_input(
             }
 
     # Fresh field — just set
-    pointer = dotted_to_pointer(slot)
-    if slot == "backdrop_decor.types":
+    pointer = dotted_to_pointer(target_slot)
+    if target_slot == "backdrop_decor.types":
         # Also enable backdrop
         ops = create_replace_patch("/backdrop_decor/enabled", True)
         ops += create_add_patch(pointer, values)
@@ -279,7 +313,11 @@ def process_user_input(
         ops = create_add_patch(pointer, values)
 
     conf_text = format_confirmation(values)
-    next_slot = _advance_slot(state, slot)
+    
+    if target_slot != slot and not slot_is_filled(state, slot):
+        next_slot = slot
+    else:
+        next_slot = _advance_slot(state, slot)
 
     return {
         "patch_ops": ops,

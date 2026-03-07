@@ -9,6 +9,7 @@ import asyncio
 import json
 import os
 import sys
+import time
 import logging
 from typing import Any
 
@@ -139,8 +140,9 @@ async def handle_ws_session(websocket: WebSocket, session_id: str, mgr: SessionM
                     continue
 
                 # ── Conversation logic ──────────────────────
+                start_t = time.perf_counter()
                 if pending:
-                    parsed = parser.parse(text, pending["slot"], state)
+                    parsed = await parser.parse(text, pending["slot"], state)
                     intent = parsed["intent"]
                     if intent in ("confirm", "set"):
                         intent = "add"
@@ -177,6 +179,8 @@ async def handle_ws_session(websocket: WebSocket, session_id: str, mgr: SessionM
 
                     mgr.add_transcript(session_id, "maya", response, True)
                     await mgr.broadcast(session_id, EventType.SERVER_PROMPT, {"text": response})
+                    duration_ms = (time.perf_counter() - start_t) * 1000
+                    logger.info(f"[METRICS] Orchestrator Turn (Confirm) duration: {duration_ms:.1f}ms")
 
                     # Background memory compression
                     asyncio.create_task(_maybe_compress_memory(session_id, mgr))
@@ -187,7 +191,7 @@ async def handle_ws_session(websocket: WebSocket, session_id: str, mgr: SessionM
                     await mgr.broadcast(session_id, EventType.SERVER_PROMPT, {"text": COMPLETION_MESSAGE})
                     continue
 
-                parsed = parser.parse(text, current_slot, state)
+                parsed = await parser.parse(text, current_slot, state)
                 result = process_user_input(text, current_slot, parsed, state)
 
                 if result["needs_confirmation"]:
@@ -215,6 +219,8 @@ async def handle_ws_session(websocket: WebSocket, session_id: str, mgr: SessionM
 
                     mgr.add_transcript(session_id, "maya", response, True)
                     await mgr.broadcast(session_id, EventType.SERVER_PROMPT, {"text": response})
+                    duration_ms = (time.perf_counter() - start_t) * 1000
+                    logger.info(f"[METRICS] Orchestrator Turn (Process) duration: {duration_ms:.1f}ms")
 
                 # Background memory compression
                 asyncio.create_task(_maybe_compress_memory(session_id, mgr))

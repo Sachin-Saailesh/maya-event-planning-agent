@@ -21,8 +21,8 @@ export function useLiveKit(sessionId) {
       const { Room, RoomEvent } = await import('livekit-client');
       const room = new Room({
         audioCaptureDefaults: {
-          echoCancellation: false,
-          noiseSuppression: false,
+          echoCancellation: true,
+          noiseSuppression: true,
           autoGainControl: true,
         },
         adaptiveStream: true,
@@ -74,8 +74,8 @@ export function useLiveKit(sessionId) {
         setMicEnabled(false);
       } else {
         await room.localParticipant.setMicrophoneEnabled(true, {
-          echoCancellation: false,
-          noiseSuppression: false,
+          echoCancellation: true,
+          noiseSuppression: true,
           autoGainControl: true,
         });
         setMicEnabled(true);

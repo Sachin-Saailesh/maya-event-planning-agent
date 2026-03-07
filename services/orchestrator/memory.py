@@ -11,9 +11,9 @@ from typing import Any
 logger = logging.getLogger(__name__)
 
 # How many recent turns to keep in full
-RECENT_TURNS_LIMIT = int(os.getenv("RECENT_TURNS_LIMIT", "6"))
+RECENT_TURNS_LIMIT = int(os.getenv("RECENT_TURNS_LIMIT", "4"))
 # Compress every N turns
-COMPRESS_INTERVAL = int(os.getenv("COMPRESS_INTERVAL", "6"))
+COMPRESS_INTERVAL = int(os.getenv("COMPRESS_INTERVAL", "4"))
 
 
 def should_compress(turn_count: int) -> bool:

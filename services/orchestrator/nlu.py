@@ -12,7 +12,7 @@ from typing import Any
 import sys
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", "packages", "schema"))
 
-from maya_schema.state import BACKDROP_ALLOWED_TYPES
+from maya_schema.state import BACKDROP_ALLOWED_TYPES, SLOT_PRIORITY
 
 # ── Known vocabularies ────────────────────────────────────────────
 
@@ -60,7 +60,7 @@ class NLUParser(ABC):
     """Interface for NLU parsers. Implement parse() to extract slot values from text."""
 
     @abstractmethod
-    def parse(self, text: str, current_slot: str, state: dict[str, Any]) -> dict[str, Any]:
+    async def parse(self, text: str, current_slot: str, state: dict[str, Any]) -> dict[str, Any]:
         """
         Parse user text and return extraction result.
         Returns: {
@@ -77,7 +77,7 @@ class NLUParser(ABC):
 class RuleBasedParser(NLUParser):
     """Keyword matching + pattern extraction NLU."""
 
-    def parse(self, text: str, current_slot: str, state: dict[str, Any]) -> dict[str, Any]:
+    async def parse(self, text: str, current_slot: str, state: dict[str, Any]) -> dict[str, Any]:
         text_lower = text.lower().strip()
         intent = self._detect_intent(text_lower)
         values = self._extract_values(text_lower, current_slot)
@@ -161,21 +161,72 @@ class RuleBasedParser(NLUParser):
 # ── LLM parser (stub, disabled by default) ─────────────────────────
 
 class LLMParser(NLUParser):
-    """LLM-based parser. Disabled by default. Set NLU_BACKEND=llm to enable."""
+    """LLM-based parser. Set NLU_BACKEND=llm to enable."""
 
     def __init__(self):
         self.enabled = os.getenv("NLU_BACKEND", "rule_based") == "llm"
+        if self.enabled:
+            from openai import AsyncOpenAI
+            self.client = AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-    def parse(self, text: str, current_slot: str, state: dict[str, Any]) -> dict[str, Any]:
+    async def parse(self, text: str, current_slot: str, state: dict[str, Any]) -> dict[str, Any]:
         if not self.enabled:
             raise RuntimeError("LLM parser is disabled. Set NLU_BACKEND=llm to enable.")
-        # Placeholder: would call OpenAI chat completions here
-        # with a structured prompt to extract slot values
-        return {
-            "values": [],
-            "intent": "unknown",
-            "raw_text": text,
-        }
+
+        prompt = f"""You are an NLU engine for a wedding decoration planner.
+Extract the decoration preferences from the user's text.
+Current slot being asked about: "{current_slot}"
+Available slots: {", ".join(SLOT_PRIORITY)}
+
+User's response: "{text}"
+
+Return a JSON object exactly like this:
+{{
+  "slot": "the slot the user is actually answering (default to {current_slot} if ambiguous)",
+  "values": ["list", "of", "extracted", "keywords"],
+  "intent": "add" | "remove" | "replace" | "set" | "confirm" | "deny" | "greeting" | "acknowledgment" | "unknown"
+}}
+
+Rules:
+1. ONLY extract relevant decoration keywords (e.g., "floral arch", "maroon"). 
+2. EXCLUDE conversational filler ("I want", "a", "can you", "please").
+3. CRITICAL: If the user says something irrelevant or conversational noise (e.g. "oh", "repeat that", "what", "lambda"), return "values": [] and "intent": "unknown".
+4. Determine the intent:
+   - "confirm" for "yes/sure", "deny" for "no/skip"
+   - "add" for adding to a list, "replace" or "remove" if they specify it.
+   - "set" for just giving the answer.
+   - "greeting" if they just say Hi/Hello.
+   - "acknowledgment" if they just say "perfect", "great", "awesome", "okay" without providing new details.
+5. Identify the correct "slot" from the Available slots list based on the user's keywords. 
+   - CRITICAL: If the user explicitly mentions colors (e.g. "red", "blue", "colors"), the slot MUST be "primary_colors", even if the current slot is something else.
+   - CRITICAL: If the user explicitly mentions flowers (e.g. "jasmine", "roses"), the slot MUST be "types_of_flowers", even if the current slot is something else.
+   - If they are answering the current question directly without pivoting, use "{current_slot}".
+"""
+
+        try:
+            import json
+            response = await self.client.chat.completions.create(
+                model="gpt-4o-mini",
+                messages=[{"role": "user", "content": prompt}],
+                response_format={"type": "json_object"},
+                temperature=0.0,
+            )
+            raw = response.choices[0].message.content
+            parsed = json.loads(raw)
+            return {
+                "slot": parsed.get("slot", current_slot),
+                "values": parsed.get("values", []),
+                "intent": parsed.get("intent", "unknown"),
+                "raw_text": text,
+            }
+        except Exception as e:
+            # Fallback on failure
+            return {
+                "slot": current_slot,
+                "values": [],
+                "intent": "unknown",
+                "raw_text": text,
+            }
 
 
 # ── Factory ────────────────────────────────────────────────────────

@@ -7,6 +7,7 @@ import asyncio
 import io
 import logging
 import os
+import time
 from typing import Optional
 
 from openai import AsyncOpenAI
@@ -45,6 +46,7 @@ async def transcribe(
             audio_file = io.BytesIO(audio_bytes)
             audio_file.name = "audio.webm"
 
+            start_t = time.perf_counter()
             transcript = await asyncio.wait_for(
                 client.audio.transcriptions.create(
                     model=model,
@@ -54,7 +56,10 @@ async def transcribe(
                 ),
                 timeout=timeout,
             )
-            return transcript.strip()
+            duration_ms = (time.perf_counter() - start_t) * 1000
+            txt = transcript.strip()
+            logger.info(f"[METRICS] STT Whisper duration: {duration_ms:.1f}ms (length: {len(txt)})")
+            return txt
 
         except asyncio.TimeoutError:
             logger.warning(f"Whisper timeout (attempt {attempt + 1}/{max_retries})")

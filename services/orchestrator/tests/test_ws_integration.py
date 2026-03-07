@@ -6,6 +6,9 @@ import sys
 import os
 import json
 
+# Force rule-based NLU so tests don't spend actual OpenAI tokens
+os.environ["NLU_BACKEND"] = "rule_based"
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", "..", "packages", "schema"))
 

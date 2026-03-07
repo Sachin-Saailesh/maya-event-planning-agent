@@ -23,7 +23,7 @@ class VoiceActivityDetector:
         frame_duration_ms: int = 30,
     ):
         self.energy_threshold = energy_threshold or float(os.getenv("VAD_ENERGY_THRESHOLD", "0.04"))
-        self.silence_duration_ms = silence_duration_ms or int(os.getenv("VAD_SILENCE_MS", "1500"))
+        self.silence_duration_ms = silence_duration_ms or int(os.getenv("VAD_SILENCE_MS", "700"))
         self.sample_rate = sample_rate
         self.frame_duration_ms = frame_duration_ms
 

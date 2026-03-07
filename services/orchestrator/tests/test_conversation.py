@@ -30,47 +30,57 @@ class TestRuleBasedParser:
         self.parser = RuleBasedParser()
         self.state = create_empty_state()
 
-    def test_color_extraction(self):
-        result = self.parser.parse("I'd like gold and maroon", "primary_colors", self.state)
+    @pytest.mark.asyncio
+    async def test_color_extraction(self):
+        result = await self.parser.parse("I'd like gold and maroon", "primary_colors", self.state)
         assert "gold" in result["values"]
         assert "maroon" in result["values"]
 
-    def test_flower_extraction(self):
-        result = self.parser.parse("jasmine and roses please", "types_of_flowers", self.state)
+    @pytest.mark.asyncio
+    async def test_flower_extraction(self):
+        result = await self.parser.parse("jasmine and roses please", "types_of_flowers", self.state)
         assert "jasmine" in result["values"]
         assert "roses" in result["values"]
 
-    def test_backdrop_extraction(self):
-        result = self.parser.parse("flowers and pattern", "backdrop_decor.types", self.state)
+    @pytest.mark.asyncio
+    async def test_backdrop_extraction(self):
+        result = await self.parser.parse("flowers and pattern", "backdrop_decor.types", self.state)
         assert "flowers" in result["values"]
         assert "pattern" in result["values"]
 
-    def test_intent_add(self):
-        result = self.parser.parse("also add blue", "primary_colors", self.state)
+    @pytest.mark.asyncio
+    async def test_intent_add(self):
+        result = await self.parser.parse("also add blue", "primary_colors", self.state)
         assert result["intent"] == "add"
 
-    def test_intent_remove(self):
-        result = self.parser.parse("remove maroon", "primary_colors", self.state)
+    @pytest.mark.asyncio
+    async def test_intent_remove(self):
+        result = await self.parser.parse("remove maroon", "primary_colors", self.state)
         assert result["intent"] == "remove"
 
-    def test_intent_replace(self):
-        result = self.parser.parse("replace with silver", "primary_colors", self.state)
+    @pytest.mark.asyncio
+    async def test_intent_replace(self):
+        result = await self.parser.parse("replace with silver", "primary_colors", self.state)
         assert result["intent"] == "replace"
 
-    def test_intent_confirm(self):
-        result = self.parser.parse("yes", "primary_colors", self.state)
+    @pytest.mark.asyncio
+    async def test_intent_confirm(self):
+        result = await self.parser.parse("yes", "primary_colors", self.state)
         assert result["intent"] == "confirm"
 
-    def test_intent_deny(self):
-        result = self.parser.parse("no", "primary_colors", self.state)
+    @pytest.mark.asyncio
+    async def test_intent_deny(self):
+        result = await self.parser.parse("no", "primary_colors", self.state)
         assert result["intent"] == "deny"
 
-    def test_freeform_extraction(self):
-        result = self.parser.parse("floral arch, rangoli, lanterns", "entrance_decor.foyer", self.state)
+    @pytest.mark.asyncio
+    async def test_freeform_extraction(self):
+        result = await self.parser.parse("floral arch, rangoli, lanterns", "entrance_decor.foyer", self.state)
         assert len(result["values"]) >= 2
 
-    def test_light_extraction(self):
-        result = self.parser.parse("fairy lights and candle lights", "decor_lights", self.state)
+    @pytest.mark.asyncio
+    async def test_light_extraction(self):
+        result = await self.parser.parse("fairy lights and candle lights", "decor_lights", self.state)
         assert "fairy lights" in result["values"]
         assert "candle lights" in result["values"]
 
