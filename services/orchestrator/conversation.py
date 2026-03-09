@@ -100,9 +100,37 @@ GREETING = (
 
 COMPLETION_MESSAGE = (
     "That covers everything! Your decoration brief is ready. "
-    "You can review all the details in the state panel on the right, "
-    "and click 'Export Brief' to get a shareable summary."
+    "Would you like to change anything, or shall we wrap up the session?"
 )
+
+SESSION_ENDED_MESSAGE = (
+    "Perfect! It was a pleasure helping you plan. "
+    "Your decoration brief has been saved — click 'Export Brief' to download a shareable summary. "
+    "Have a wonderful event!"
+)
+
+# Polite / social phrases that should get a warm acknowledgment, not be parsed as slot input
+POLITE_PHRASES = {
+    "thank you", "thanks", "thank you so much", "thanks a lot", "great", "awesome",
+    "perfect", "wonderful", "nice", "good", "okay", "ok", "sure", "alright",
+    "sounds good", "that sounds great", "lovely", "brilliant", "excellent",
+    "you're welcome", "appreciate it", "got it", "understood", "cool",
+}
+
+POLITE_RESPONSES = [
+    "Of course! Happy to help.",
+    "No problem at all!",
+    "Absolutely! Let's keep going.",
+    "My pleasure!",
+    "Sure thing!",
+]
+
+# Phrases that signal the user wants to end the session
+END_SESSION_PHRASES = {
+    "end", "end session", "stop", "finish", "done", "wrap up", "that's all",
+    "that is all", "close", "goodbye", "bye", "exit", "quit", "no changes",
+    "no change", "no thank you", "no thanks", "nothing", "all good", "looks good",
+}
 
 
 def get_slot_prompt(slot: str) -> str:
@@ -117,6 +145,23 @@ def get_slot_prompt(slot: str) -> str:
 
 def get_greeting() -> str:
     return GREETING
+
+
+def is_polite_phrase(text: str) -> bool:
+    """Return True if the text is a social/polite filler that should not be parsed as a slot."""
+    normalized = text.lower().strip().rstrip("!.").strip()
+    return normalized in POLITE_PHRASES
+
+
+def get_polite_response() -> str:
+    """Return a warm, brief acknowledgment for social phrases."""
+    return random.choice(POLITE_RESPONSES)
+
+
+def is_end_session_intent(text: str) -> bool:
+    """Return True if the user is signalling they want to end the session."""
+    normalized = text.lower().strip().rstrip("!.").strip()
+    return normalized in END_SESSION_PHRASES
 
 
 def format_confirmation(values: list[str]) -> str:

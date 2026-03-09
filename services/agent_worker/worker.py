@@ -37,6 +37,7 @@ class AgentWorker:
         self._audio_buffer: list[bytes] = []
         self._ws = None
         self._room = room
+        self._reader_task: asyncio.Task | None = None
 
     async def run(self):
         """Main entry: connect to orchestrator, process audio from existing room."""
@@ -55,44 +56,74 @@ class AgentWorker:
                     logger.info(f"Found existing audio track from {participant.identity}")
                     asyncio.create_task(self._process_audio_track(track_publication.track))
 
-        # Loop to keep checking orchestrator connection and re-connect if closed
         try:
-            # Notify orchestrator of connection start
+            # Connect to orchestrator and start the background reader
             await self._connect_and_notify()
 
-            # Keep running and reconnecting if dev server reloads
-            while True:
-                if not self._ws or self._ws.closed:
-                    logger.warning("Orchestrator WS is closed. Attempting reconnect...")
-                    await self._connect_and_notify()
-                await asyncio.sleep(1)
+            # Keep the coroutine alive; LiveKit will cancel us when the room ends
+            await asyncio.Event().wait()
 
         finally:
+            if self._reader_task:
+                self._reader_task.cancel()
             if self._ws:
-                await self._ws.close()
+                try:
+                    await self._ws.close()
+                except Exception:
+                    pass
+
 
     async def _connect_and_notify(self):
-        """Connect to orchestrator and send initial ready event."""
+        """Connect to orchestrator, send initial ready event, and start background reader."""
         orch_url = f"{self.orchestrator_url}/ws/session/{self.session_id}"
         try:
             if self._ws:
-                await self._ws.close()
+                try:
+                    await self._ws.close()
+                except Exception:
+                    pass
             self._ws = await websockets.connect(orch_url)
             logger.info("Connected to orchestrator")
+            # Start background reader so the websockets library can service server pings
+            if self._reader_task:
+                self._reader_task.cancel()
+            self._reader_task = asyncio.create_task(self._ws_reader())
             await self._send_event("client.audio.started", {})
             logger.info("Worker fully connected and listening.")
         except Exception as e:
             logger.error(f"Failed to connect to orchestrator: {e}")
 
+    async def _ws_reader(self):
+        """Background task: drain inbound WebSocket messages.
+        
+        This is required for the websockets library to service server-sent
+        ping frames and reply with pong frames. Without this, the server closes
+        the connection with code 1011 (keepalive ping timeout).
+        """
+        try:
+            async for message in self._ws:
+                # We receive nothing useful from the server in this direction,
+                # but we must keep reading to service keepalive pings.
+                pass
+        except Exception:
+            pass
+
     async def _process_audio_track(self, track: rtc.Track):
         """Process incoming audio track frames."""
         audio_stream = rtc.AudioStream(track)
+        frame_count = 0
 
         async for frame_event in audio_stream:
             frame = frame_event.frame
             pcm_data = bytes(frame.data)
+            frame_count += 1
+            duration_ms = (len(pcm_data) / 2 / frame.num_channels) / frame.sample_rate * 1000.0
 
-            vad_result = self.vad.process_frame(pcm_data)
+            # Log periodically to confirm frames are flowing
+            if frame_count % 500 == 0:
+                logger.info(f"[AUDIO] Received {frame_count} frames. sr={frame.sample_rate} ch={frame.num_channels} pcm_len={len(pcm_data)}")
+
+            vad_result = self.vad.process_frame(pcm_data, duration_ms)
 
             if vad_result == "speech_start":
                 self._audio_buffer = [pcm_data]
@@ -104,15 +135,15 @@ class AgentWorker:
                 # Combine buffer and transcribe
                 all_audio = b"".join(self._audio_buffer)
                 self._audio_buffer = []
-                asyncio.create_task(self._transcribe_and_send(all_audio, frame.sample_rate))
+                asyncio.create_task(self._transcribe_and_send(all_audio, frame.sample_rate, frame.num_channels))
 
-    async def _transcribe_and_send(self, pcm_data: bytes, sample_rate: int):
+    async def _transcribe_and_send(self, pcm_data: bytes, sample_rate: int, num_channels: int):
         """Convert PCM to WAV, transcribe with Whisper, send to orchestrator."""
         try:
             # Convert PCM to WAV
             wav_buffer = io.BytesIO()
             with wave.open(wav_buffer, "wb") as wf:
-                wf.setnchannels(1)
+                wf.setnchannels(num_channels)
                 wf.setsampwidth(2)  # 16-bit
                 wf.setframerate(sample_rate)
                 wf.writeframes(pcm_data)
@@ -132,14 +163,31 @@ class AgentWorker:
             logger.error(f"Transcription error: {e}")
 
     async def _send_event(self, event_type: str, payload: dict):
-        """Send event to orchestrator via WebSocket."""
-        if self._ws:
-            event = {
-                "type": event_type,
-                "session_id": self.session_id,
-                "payload": payload,
-            }
-            await self._ws.send(json.dumps(event))
+        """Send event to orchestrator via WebSocket with auto-reconnect."""
+        event = {
+            "type": event_type,
+            "session_id": self.session_id,
+            "payload": payload,
+        }
+        event_str = json.dumps(event)
+        
+        for attempt in range(3):
+            try:
+                if not self._ws:
+                    orch_url = f"{self.orchestrator_url}/ws/session/{self.session_id}"
+                    self._ws = await websockets.connect(orch_url)
+                    # Restart the background reader after reconnect
+                    if self._reader_task:
+                        self._reader_task.cancel()
+                    self._reader_task = asyncio.create_task(self._ws_reader())
+                    logger.info("Reconnected to orchestrator for STT send")
+                    
+                await self._ws.send(event_str)
+                return
+            except Exception as e:
+                logger.warning(f"WS send error (attempt {attempt+1}): {e}")
+                self._ws = None
+                await asyncio.sleep(0.5)
 
 
 async def entrypoint(ctx: JobContext):

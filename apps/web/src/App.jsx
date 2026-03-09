@@ -5,6 +5,7 @@ import { useLiveKit } from "./hooks/useLiveKit.js";
 import Transcript from "./components/Transcript.jsx";
 import StatePanel from "./components/StatePanel.jsx";
 import ExportBrief from "./components/ExportBrief.jsx";
+import AudioWaveform from "./components/AudioWaveform.jsx";
 
 /**
  * Maya — South Indian Wedding Decoration Planner
@@ -21,8 +22,8 @@ export default function App() {
     connected: lkConnected,
     micEnabled,
     connect: lkConnect,
-    toggleMic,
     disconnect: lkDisconnect,
+    room,
   } = useLiveKit(sessionId);
 
   const {
@@ -42,6 +43,7 @@ export default function App() {
 
   const {
     speak,
+    speakChunk,
     stop: stopTTS,
     isSpeaking,
     cancelForBargeIn,
@@ -83,10 +85,10 @@ export default function App() {
 
   // Turn on mic automatically when LiveKit connects
   useEffect(() => {
-    if (lkConnected && !micEnabled) {
-      toggleMic(true);
-    }
-  }, [lkConnected, micEnabled, toggleMic]);
+    // BUG FIX: Intentionally left empty to prevent double-triggering toggleMic
+    // The previous implementation watched `micEnabled` which instantly fired
+    // a second toggle every time the user manually clicked the button.
+  }, []);
 
   const handleStartSession = useCallback(async () => {
     setLoading(true);
@@ -251,15 +253,7 @@ export default function App() {
           </div>
         ) : (
           <div className="sim-input">
-            {lkConnected && (
-              <button
-                className={`btn-mic ${micEnabled ? "active" : ""}`}
-                onClick={toggleMic}
-                title={micEnabled ? "Mute Microphone" : "Enable Microphone"}
-              >
-                {micEnabled ? "🎙️" : "🔇"}
-              </button>
-            )}
+            {lkConnected && <AudioWaveform room={room} />}
             <input
               type="text"
               value={inputText}

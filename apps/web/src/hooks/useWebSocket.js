@@ -86,6 +86,7 @@ export function useWebSocket(sessionId) {
 
       case 'client.transcript.final':
         // Voice transcript from agent worker — show user's spoken text in the UI
+        console.log(`[STT_OUTPUT] Received final transcript: "${payload.text}"`);
         setPartialText('');
         setTranscript(prev => {
           // Avoid duplicate if we already added this locally via sendTranscript

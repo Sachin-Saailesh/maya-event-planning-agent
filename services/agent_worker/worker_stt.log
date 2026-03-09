@@ -1,0 +1,80 @@
+2026-03-08 17:45:20,330 [livekit.agents] INFO: starting worker
+{"message": "starting worker", "level": "INFO", "name": "livekit.agents", "version": "1.4.4", "rtc-version": "1.1.2", "timestamp": "2026-03-08T21:45:20.330437+00:00"}
+2026-03-08 17:45:20,332 [livekit.agents] INFO: HTTP server listening on :8081
+{"message": "HTTP server listening on :8081", "level": "INFO", "name": "livekit.agents", "timestamp": "2026-03-08T21:45:20.332110+00:00"}
+2026-03-08 17:45:20,354 [livekit.agents] INFO: initializing process
+{"message": "initializing process", "level": "INFO", "name": "livekit.agents", "pid": 44918, "timestamp": "2026-03-08T21:45:20.354907+00:00"}
+2026-03-08 17:45:20,355 [livekit.agents] INFO: initializing process
+{"message": "initializing process", "level": "INFO", "name": "livekit.agents", "pid": 44920, "timestamp": "2026-03-08T21:45:20.355291+00:00"}
+2026-03-08 17:45:20,355 [livekit.agents] INFO: initializing process
+{"message": "initializing process", "level": "INFO", "name": "livekit.agents", "pid": 44919, "timestamp": "2026-03-08T21:45:20.355701+00:00"}
+2026-03-08 17:45:20,355 [livekit.agents] INFO: initializing process
+{"message": "initializing process", "level": "INFO", "name": "livekit.agents", "pid": 44921, "timestamp": "2026-03-08T21:45:20.355849+00:00"}
+2026-03-08 17:45:21,003 [livekit.agents] INFO: process initialized
+{"message": "process initialized", "level": "INFO", "name": "livekit.agents", "pid": 44918, "elapsed_time": 0.65, "timestamp": "2026-03-08T21:45:21.003629+00:00"}
+2026-03-08 17:45:21,004 [livekit.agents] INFO: process initialized
+{"message": "process initialized", "level": "INFO", "name": "livekit.agents", "pid": 44920, "elapsed_time": 0.65, "timestamp": "2026-03-08T21:45:21.004288+00:00"}
+2026-03-08 17:45:21,004 [livekit.agents] INFO: process initialized
+{"message": "process initialized", "level": "INFO", "name": "livekit.agents", "pid": 44919, "elapsed_time": 0.65, "timestamp": "2026-03-08T21:45:21.004466+00:00"}
+2026-03-08 17:45:21,008 [livekit.agents] INFO: process initialized
+{"message": "process initialized", "level": "INFO", "name": "livekit.agents", "pid": 44921, "elapsed_time": 0.65, "timestamp": "2026-03-08T21:45:21.008521+00:00"}
+2026-03-08 17:45:21,016 [livekit.agents] INFO: registered worker
+{"message": "registered worker", "level": "INFO", "name": "livekit.agents", "agent_name": "", "id": "AW_MYvaLktUJNJQ", "url": "ws://localhost:7880", "region": "", "protocol": 16, "timestamp": "2026-03-08T21:45:21.016084+00:00"}
+2026-03-08 17:46:05,402 [livekit.agents] INFO: received job request
+{"message": "received job request", "level": "INFO", "name": "livekit.agents", "job_id": "AJ_mhA4HoaRgToH", "dispatch_id": "AD_W8hKxV5iyeJL", "room": "62c725df-7266-4470-a15c-91ca3eea52dc", "room_id": "RM_TUZrWDhb4Mu8", "agent_name": "", "resuming": false, "enable_recording": false, "timestamp": "2026-03-08T21:46:05.402856+00:00"}
+2026-03-08 17:46:05,403 [agent_worker] INFO: Accepting job for room 62c725df-7266-4470-a15c-91ca3eea52dc
+{"message": "Accepting job for room 62c725df-7266-4470-a15c-91ca3eea52dc", "level": "INFO", "name": "agent_worker", "timestamp": "2026-03-08T21:46:05.403730+00:00"}
+2026-03-08 17:46:05,489 [livekit.agents] INFO: initializing process
+{"message": "initializing process", "level": "INFO", "name": "livekit.agents", "pid": 45074, "timestamp": "2026-03-08T21:46:05.489030+00:00"}
+2026-03-08 17:46:05,560 [agent_worker] INFO: Starting worker for session 62c725df-7266-4470-a15c-91ca3eea52dc
+2026-03-08 17:46:05,560 [agent_worker] INFO: Starting worker for session 62c725df-7266-4470-a15c-91ca3eea52dc
+{"message": "Starting worker for session 62c725df-7266-4470-a15c-91ca3eea52dc", "level": "INFO", "name": "agent_worker", "pid": 44918, "job_id": "AJ_mhA4HoaRgToH", "room_id": "RM_TUZrWDhb4Mu8", "timestamp": "2026-03-08T21:46:05.560518+00:00"}
+2026-03-08 17:46:05,613 [agent_worker] INFO: Connected to orchestrator
+2026-03-08 17:46:05,613 [agent_worker] INFO: Worker fully connected and listening.
+2026-03-08 17:46:05,613 [agent_worker] INFO: Connected to orchestrator
+{"message": "Connected to orchestrator", "level": "INFO", "name": "agent_worker", "pid": 44918, "job_id": "AJ_mhA4HoaRgToH", "room_id": "RM_TUZrWDhb4Mu8", "timestamp": "2026-03-08T21:46:05.613574+00:00"}
+2026-03-08 17:46:05,613 [agent_worker] INFO: Worker fully connected and listening.
+{"message": "Worker fully connected and listening.", "level": "INFO", "name": "agent_worker", "pid": 44918, "job_id": "AJ_mhA4HoaRgToH", "room_id": "RM_TUZrWDhb4Mu8", "timestamp": "2026-03-08T21:46:05.613818+00:00"}
+2026-03-08 17:46:05,614 [livekit.agents] ERROR: unhandled exception while running the job task
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/opentelemetry/util/_decorator.py", line 71, in async_wrapper
+    return await func(*args, **kwargs)  # type: ignore
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/livekit/agents/ipc/job_proc_lazy_main.py", line 306, in _traceable_entrypoint
+    await self._job_entrypoint_fnc(job_ctx)
+  File "/Users/sachinjeyy/Desktop/maya-event-planning-voice-agent/services/agent_worker/worker.py", line 163, in entrypoint
+    await worker.run()
+  File "/Users/sachinjeyy/Desktop/maya-event-planning-voice-agent/services/agent_worker/worker.py", line 67, in run
+    if not self._ws or self._ws.closed:
+                       ^^^^^^^^^^^^^^^
+AttributeError: 'ClientConnection' object has no attribute 'closed'. Did you mean: 'close'?
+2026-03-08 17:46:05,614 [livekit.agents] ERROR: unhandled exception while running the job task
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/opentelemetry/util/_decorator.py", line 71, in async_wrapper
+    return await func(*args, **kwargs)  # type: ignore
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/livekit/agents/ipc/job_proc_lazy_main.py", line 306, in _traceable_entrypoint
+    await self._job_entrypoint_fnc(job_ctx)
+  File "/Users/sachinjeyy/Desktop/maya-event-planning-voice-agent/services/agent_worker/worker.py", line 163, in entrypoint
+    await worker.run()
+  File "/Users/sachinjeyy/Desktop/maya-event-planning-voice-agent/services/agent_worker/worker.py", line 67, in run
+    if not self._ws or self._ws.closed:
+                       ^^^^^^^^^^^^^^^
+AttributeError: 'ClientConnection' object has no attribute 'closed'. Did you mean: 'close'?
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/opentelemetry/util/_decorator.py", line 71, in async_wrapper
+    return await func(*args, **kwargs)  # type: ignore
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/livekit/agents/ipc/job_proc_lazy_main.py", line 306, in _traceable_entrypoint
+    await self._job_entrypoint_fnc(job_ctx)
+  File "/Users/sachinjeyy/Desktop/maya-event-planning-voice-agent/services/agent_worker/worker.py", line 163, in entrypoint
+    await worker.run()
+  File "/Users/sachinjeyy/Desktop/maya-event-planning-voice-agent/services/agent_worker/worker.py", line 67, in run
+    if not self._ws or self._ws.closed:
+                       ^^^^^^^^^^^^^^^
+AttributeError: 'ClientConnection' object has no attribute 'closed'. Did you mean: 'close'?
+{"message": "unhandled exception while running the job task\nTraceback (most recent call last):\n  File \"/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/opentelemetry/util/_decorator.py\", line 71, in async_wrapper\n    return await func(*args, **kwargs)  # type: ignore\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/livekit/agents/ipc/job_proc_lazy_main.py\", line 306, in _traceable_entrypoint\n    await self._job_entrypoint_fnc(job_ctx)\n  File \"/Users/sachinjeyy/Desktop/maya-event-planning-voice-agent/services/agent_worker/worker.py\", line 163, in entrypoint\n    await worker.run()\n  File \"/Users/sachinjeyy/Desktop/maya-event-planning-voice-agent/services/agent_worker/worker.py\", line 67, in run\n    if not self._ws or self._ws.closed:\n                       ^^^^^^^^^^^^^^^\nAttributeError: 'ClientConnection' object has no attribute 'closed'. Did you mean: 'close'?", "level": "ERROR", "name": "livekit.agents", "exc_info": "Traceback (most recent call last):\n  File \"/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/opentelemetry/util/_decorator.py\", line 71, in async_wrapper\n    return await func(*args, **kwargs)  # type: ignore\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/livekit/agents/ipc/job_proc_lazy_main.py\", line 306, in _traceable_entrypoint\n    await self._job_entrypoint_fnc(job_ctx)\n  File \"/Users/sachinjeyy/Desktop/maya-event-planning-voice-agent/services/agent_worker/worker.py\", line 163, in entrypoint\n    await worker.run()\n  File \"/Users/sachinjeyy/Desktop/maya-event-planning-voice-agent/services/agent_worker/worker.py\", line 67, in run\n    if not self._ws or self._ws.closed:\n                       ^^^^^^^^^^^^^^^\nAttributeError: 'ClientConnection' object has no attribute 'closed'. Did you mean: 'close'?", "pid": 44918, "job_id": "AJ_mhA4HoaRgToH", "room_id": "RM_TUZrWDhb4Mu8", "timestamp": "2026-03-08T21:46:05.614597+00:00"}
+2026-03-08 17:46:05,618 [livekit.agents] INFO: process exiting
+{"message": "process exiting", "level": "INFO", "name": "livekit.agents", "reason": "job crashed", "pid": 44918, "job_id": "AJ_mhA4HoaRgToH", "room_id": "RM_TUZrWDhb4Mu8", "timestamp": "2026-03-08T21:46:05.618807+00:00"}
+2026-03-08 17:46:06,470 [livekit.agents] INFO: process initialized
+{"message": "process initialized", "level": "INFO", "name": "livekit.agents", "pid": 45074, "elapsed_time": 0.98, "timestamp": "2026-03-08T21:46:06.470042+00:00"}

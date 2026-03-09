@@ -29,6 +29,10 @@ from conversation import (
     resolve_confirmation,
     generate_summary_text,
     COMPLETION_MESSAGE,
+    SESSION_ENDED_MESSAGE,
+    is_polite_phrase,
+    get_polite_response,
+    is_end_session_intent,
 )
 from nlu import get_parser
 from guardrails import check_input, check_output, get_guardrail_message
@@ -139,6 +143,17 @@ async def handle_ws_session(websocket: WebSocket, session_id: str, mgr: SessionM
                         })
                     continue
 
+                # ── Polite / social phrase handling ─────────
+                if is_polite_phrase(text) and not pending:
+                    polite_ack = get_polite_response()
+                    if current_slot:
+                        response = f"{polite_ack} {get_slot_prompt(current_slot)}"
+                    else:
+                        response = f"{polite_ack} {COMPLETION_MESSAGE}"
+                    mgr.add_transcript(session_id, "maya", response, True)
+                    await mgr.broadcast(session_id, EventType.SERVER_PROMPT, {"text": response})
+                    continue
+
                 # ── Conversation logic ──────────────────────
                 start_t = time.perf_counter()
                 if pending:
@@ -187,8 +202,16 @@ async def handle_ws_session(websocket: WebSocket, session_id: str, mgr: SessionM
                     continue
 
                 if not current_slot:
-                    mgr.add_transcript(session_id, "maya", COMPLETION_MESSAGE, True)
-                    await mgr.broadcast(session_id, EventType.SERVER_PROMPT, {"text": COMPLETION_MESSAGE})
+                    # All slots filled — check if user wants to end the session
+                    if is_end_session_intent(text):
+                        mgr.add_transcript(session_id, "maya", SESSION_ENDED_MESSAGE, True)
+                        await mgr.broadcast(session_id, EventType.SERVER_PROMPT, {"text": SESSION_ENDED_MESSAGE})
+                        # Signal the frontend to end the session
+                        await mgr.broadcast(session_id, "server.session.ended", {})
+                    else:
+                        # User said something else after completion — invite them again
+                        mgr.add_transcript(session_id, "maya", COMPLETION_MESSAGE, True)
+                        await mgr.broadcast(session_id, EventType.SERVER_PROMPT, {"text": COMPLETION_MESSAGE})
                     continue
 
                 parsed = await parser.parse(text, current_slot, state)

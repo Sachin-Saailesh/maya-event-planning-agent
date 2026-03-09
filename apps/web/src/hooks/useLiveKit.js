@@ -21,12 +21,12 @@ export function useLiveKit(sessionId) {
       const { Room, RoomEvent } = await import('livekit-client');
       const room = new Room({
         audioCaptureDefaults: {
-          echoCancellation: true,
-          noiseSuppression: true,
+          echoCancellation: false,
+          noiseSuppression: false,
           autoGainControl: true,
         },
-        adaptiveStream: true,
-        dynacast: true,
+        adaptiveStream: false,
+        dynacast: false,
       });
       roomRef.current = room;
 
@@ -58,32 +58,23 @@ export function useLiveKit(sessionId) {
       });
 
       await room.connect(url, token);
+      
+      console.log("Auto-enabling microphone...");
+      await room.localParticipant.setMicrophoneEnabled(true, {
+        echoCancellation: false,
+        noiseSuppression: false,
+        autoGainControl: true,
+      });
+      console.log("Microphone enabled automatically.");
+      setMicEnabled(true);
     } catch (err) {
       console.error('LiveKit connection failed:', err);
       setConnected(false);
     }
   }, []);
 
-  const toggleMic = useCallback(async () => {
-    const room = roomRef.current;
-    if (!room) return;
+  // toggleMic logic has been removed as the mic is always on
 
-    try {
-      if (micEnabled) {
-        room.localParticipant.setMicrophoneEnabled(false);
-        setMicEnabled(false);
-      } else {
-        await room.localParticipant.setMicrophoneEnabled(true, {
-          echoCancellation: true,
-          noiseSuppression: true,
-          autoGainControl: true,
-        });
-        setMicEnabled(true);
-      }
-    } catch (err) {
-      console.error('Mic toggle error:', err);
-    }
-  }, [micEnabled]);
 
   const disconnect = useCallback(() => {
     reconnectAttemptsRef.current = MAX_RECONNECT; // prevent auto-reconnect
@@ -101,5 +92,6 @@ export function useLiveKit(sessionId) {
     return () => disconnect();
   }, []);
 
-  return { connected, micEnabled, connect, toggleMic, disconnect };
+  // Export roomRef so the UI can read the local tracks for the waveform
+  return { connected, micEnabled, connect, disconnect, room: roomRef.current };
 }

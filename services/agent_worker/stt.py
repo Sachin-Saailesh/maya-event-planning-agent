@@ -44,7 +44,7 @@ async def transcribe(
     for attempt in range(max_retries):
         try:
             audio_file = io.BytesIO(audio_bytes)
-            audio_file.name = "audio.webm"
+            audio_file.name = "audio.wav"
 
             start_t = time.perf_counter()
             transcript = await asyncio.wait_for(
