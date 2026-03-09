@@ -1,5 +1,25 @@
-INFO:     Started server process [69717]
+INFO:     Started server process [75855]
 INFO:     Waiting for application startup.
 INFO:     Application startup complete.
 INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
-INFO:     127.0.0.1:59036 - "GET /docs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61148 - "WebSocket /ws/session/f2fbc371-05b2-4081-9eb3-0e8abb8c98ba" 403
+INFO:     connection rejected (403 Forbidden)
+INFO:     connection closed
+INFO:     127.0.0.1:61155 - "WebSocket /ws/session/f2fbc371-05b2-4081-9eb3-0e8abb8c98ba" 403
+INFO:     connection rejected (403 Forbidden)
+INFO:     connection closed
+INFO:     127.0.0.1:61158 - "WebSocket /ws/session/f2fbc371-05b2-4081-9eb3-0e8abb8c98ba" 403
+INFO:     connection rejected (403 Forbidden)
+INFO:     connection closed
+INFO:     127.0.0.1:61165 - "WebSocket /ws/session/f2fbc371-05b2-4081-9eb3-0e8abb8c98ba" 403
+INFO:     connection rejected (403 Forbidden)
+INFO:     connection closed
+INFO:     127.0.0.1:61207 - "POST /session HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61211 - "WebSocket /ws/session/ce95e19c-7911-4a23-9156-3d5fb4065149" [accepted]
+INFO:     connection open
+INFO:     127.0.0.1:61214 - "WebSocket /ws/session/ce95e19c-7911-4a23-9156-3d5fb4065149" [accepted]
+INFO:     connection open
+INFO:     127.0.0.1:61227 - "GET /tts?text=I%20didn%27t%20quite%20catch%20that. HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61234 - "GET /tts?text=I%20didn%27t%20quite%20catch%20that. HTTP/1.1" 200 OK
+INFO:     connection closed
+INFO:     connection closed

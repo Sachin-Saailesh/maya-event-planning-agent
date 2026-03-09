@@ -55,13 +55,20 @@ AI voice agent that helps plan South Indian wedding hall decorations through nat
 maya-event-planning-agent/
 ├── apps/web/              # React + Vite frontend
 ├── services/
-│   ├── orchestrator/      # FastAPI backend
-│   └── agent_worker/      # LiveKit + Whisper worker
+│   ├── orchestrator/      # FastAPI backend (NLU, RAG, State)
+│   └── agent_worker/      # LiveKit + Whisper worker (Voice/STT)
 ├── packages/schema/       # Shared state, events, patches
 ├── infra/                 # Docker, LiveKit config
+├── ai_rag_analysis.md     # Deep-dive on AI & RAG capabilities
 ├── Makefile
 └── .env.example
 ```
+
+## 🧠 AI & RAG Architecture
+
+Maya uses a hybrid approach of **Rule-based NLU** for fast, low-latency slot-filling and **Retrieval-Augmented Generation (RAG)** powered by **ChromaDB** for long-term memory across complex, multi-turn conversations.
+
+For a deep-dive analysis of Maya's AI stack, current challenges (like WebSocket keepalives and STT constraints), and our roadmap for future LLM integration, please read the [AI RAG Concepts & Deep-Dive Analysis](./ai_rag_analysis.md).
 
 ## Quick Start
 
