@@ -9,10 +9,14 @@ import { useRef, useCallback, useState } from 'react';
  * FIX: Generate audio on the backend (OpenAI tts-1 model), stream MP3 bytes,
  * and play via HTMLAudioElement — which is NOT affected by the WebRTC lock.
  *
- * Barge-in support: tracks last-spoken word position so interruption context
+ * LATENCY IMPROVEMENT: Pre-fetch all sentence TTS in parallel so there is
+ * zero per-sentence gap between sentences. Audio plays back-to-back seamlessly.
+ *
+ * Barge-in support: tracks last-spoken sentence so interruption context
  * can be sent to the backend.
  */
 export function useTTS() {
+  // Queue holds pre-fetched Audio objects (NOT text strings)
   const queueRef = useRef([]);
   const speakingRef = useRef(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
@@ -23,96 +27,135 @@ export function useTTS() {
   const currentTextRef = useRef('');
   const spokenSentencesRef = useRef([]);
 
-  const processQueue = useCallback(async () => {
+  /**
+   * Internal: play the next Audio object from the queue.
+   * The queue contains pre-fetched Audio objects, not text strings.
+   */
+  const processObjQueue = useCallback(() => {
     if (queueRef.current.length === 0) {
       speakingRef.current = false;
       setIsSpeaking(false);
       return;
     }
 
-    const text = queueRef.current.shift();
-    console.log('[TTS] Speaking:', text.substring(0, 60));
+    const audio = queueRef.current.shift();
+
+    // Cancelled while waiting
+    if (!audio) {
+      processObjQueue();
+      return;
+    }
+
+    const currentGen = generationIdRef.current;
     speakingRef.current = true;
     setIsSpeaking(true);
-    currentTextRef.current = text;
-    
-    const currentGen = ++generationIdRef.current;
+    currentTextRef.current = audio._sentenceText || '';
+    audioRef.current = audio;
 
-    try {
-      const url = `/tts?text=${encodeURIComponent(text)}`;
-      const response = await fetch(url);
+    audio.onended = () => {
+      if (generationIdRef.current !== currentGen) return;
+      spokenSentencesRef.current.push(audio._sentenceText || '');
+      if (audio._blobUrl) URL.revokeObjectURL(audio._blobUrl);
+      audioRef.current = null;
+      currentTextRef.current = '';
+      processObjQueue();
+    };
 
-      // If stopped while fetching, abort this TTS
-      if (currentGen !== generationIdRef.current) return;
-
-      if (!response.ok) {
-        console.error('[TTS] Backend TTS error:', response.status, await response.text());
-        speakingRef.current = false;
-        setIsSpeaking(false);
-        processQueue();
-        return;
-      }
-
-      const audioBlob = await response.blob();
-      
-      if (currentGen !== generationIdRef.current) return;
-      
-      const audioUrl = URL.createObjectURL(audioBlob);
-
-      const audio = new Audio(audioUrl);
-      audioRef.current = audio;
-
-      audio.onended = () => {
-        spokenSentencesRef.current.push(text);
-        URL.revokeObjectURL(audioUrl);
-        audioRef.current = null;
-        currentTextRef.current = '';
-        processQueue();
-      };
-
-      audio.onerror = (e) => {
-        console.error('[TTS] Audio playback error:', e);
-        URL.revokeObjectURL(audioUrl);
-        audioRef.current = null;
-        speakingRef.current = false;
-        setIsSpeaking(false);
-        processQueue();
-      };
-
-      await audio.play();
-    } catch (err) {
-      console.error('[TTS] Fetch/play error:', err);
+    audio.onerror = (e) => {
+      console.error('[TTS] Audio playback error:', e);
+      if (audio._blobUrl) URL.revokeObjectURL(audio._blobUrl);
+      audioRef.current = null;
       speakingRef.current = false;
       setIsSpeaking(false);
-      processQueue();
-    }
+      processObjQueue();
+    };
+
+    audio.play().catch((err) => {
+      console.error('[TTS] play() error:', err);
+      speakingRef.current = false;
+      setIsSpeaking(false);
+      processObjQueue();
+    });
   }, []);
 
-  const speak = useCallback((text) => {
+  /**
+   * Speak a full prompt text.
+   *
+   * Splits into sentences and pre-fetches ALL TTS audio in parallel so there
+   * is no per-sentence network round-trip between sentences.
+   * Audio objects are queued in order and played back-to-back seamlessly.
+   */
+  const speak = useCallback(async (text) => {
     if (!text) return;
-    queueRef.current.push(text);
-    if (!speakingRef.current) {
-      processQueue();
-    }
-  }, [processQueue]);
 
+    const capturedGen = ++generationIdRef.current;
+
+    // Split on sentence boundaries (., !, ?) keeping delimiters
+    const sentences = text.match(/[^.!?]+[.!?]+(?:\s|$)/g) || [text];
+    const trimmed = sentences.map(s => s.trim()).filter(Boolean);
+    if (trimmed.length === 0) return;
+
+    // Pre-fetch all TTS audio blobs in parallel
+    const fetchPromises = trimmed.map(async (sentence) => {
+      try {
+        const url = `/tts?text=${encodeURIComponent(sentence)}`;
+        const response = await fetch(url);
+        if (!response.ok) {
+          console.error('[TTS] Backend TTS error:', response.status);
+          return null;
+        }
+        const blob = await response.blob();
+        return { sentence, blob };
+      } catch (err) {
+        console.error('[TTS] Fetch error for sentence:', sentence, err);
+        return null;
+      }
+    });
+
+    const results = await Promise.all(fetchPromises);
+
+    // If cancelled while fetching, discard
+    if (capturedGen !== generationIdRef.current) return;
+
+    // Build Audio objects and enqueue them
+    for (const result of results) {
+      if (result && result.blob) {
+        const audioUrl = URL.createObjectURL(result.blob);
+        const audio = new Audio(audioUrl);
+        audio._sentenceText = result.sentence;
+        audio._blobUrl = audioUrl;
+        queueRef.current.push(audio);
+      }
+    }
+
+    if (!speakingRef.current) {
+      processObjQueue();
+    }
+  }, [processObjQueue]);
+
+  /**
+   * speakChunk — for backwards-compat with single-sentence chunks.
+   * Delegates to speak() which handles parallel fetching.
+   */
   const speakChunk = useCallback((chunk) => {
     if (!chunk) return;
-    queueRef.current.push(chunk);
-    if (!speakingRef.current) {
-      processQueue();
-    }
-  }, [processQueue]);
+    speak(chunk);
+  }, [speak]);
 
-  /** Stop playback immediately (barge-in or end session). */
+  /** Stop all playback immediately (barge-in or end session). */
   const stop = useCallback(() => {
-    generationIdRef.current++; // cancel pending fetches
+    generationIdRef.current++; // invalidates any pending fetches
+    // Revoke blob URLs for all queued (not-yet-played) audio objects
+    for (const audio of queueRef.current) {
+      if (audio._blobUrl) URL.revokeObjectURL(audio._blobUrl);
+    }
     queueRef.current = [];
     speakingRef.current = false;
     setIsSpeaking(false);
     currentTextRef.current = '';
 
     if (audioRef.current) {
+      if (audioRef.current._blobUrl) URL.revokeObjectURL(audioRef.current._blobUrl);
       audioRef.current.pause();
       audioRef.current.src = '';
       audioRef.current = null;

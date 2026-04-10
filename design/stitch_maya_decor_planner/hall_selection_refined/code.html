@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Maya Hall Selection</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;700&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary-fixed-dim": "#e9c349",
+                        "outline-variant": "#4d4635",
+                        "surface-container-high": "#2a2a2a",
+                        "tertiary": "#e9c7c0",
+                        "secondary": "#ddb7ff",
+                        "on-primary-container": "#554300",
+                        "background": "#131313",
+                        "surface-container": "#201f1f",
+                        "surface-container-low": "#1c1b1b",
+                        "inverse-primary": "#735c00",
+                        "on-primary": "#3c2f00",
+                        "secondary-fixed-dim": "#ddb7ff",
+                        "secondary-container": "#622599",
+                        "surface-dim": "#131313",
+                        "tertiary-fixed-dim": "#e0bfb8",
+                        "surface-tint": "#e9c349",
+                        "on-tertiary": "#402b27",
+                        "surface": "#131313",
+                        "on-tertiary-fixed-variant": "#59413c",
+                        "on-secondary": "#4a0080",
+                        "on-surface-variant": "#d0c5af",
+                        "primary": "#f2ca50",
+                        "on-primary-fixed-variant": "#574500",
+                        "error": "#ffb4ab",
+                        "surface-container-highest": "#353534",
+                        "on-surface": "#e5e2e1",
+                        "primary-fixed": "#ffe088",
+                        "tertiary-fixed": "#fedbd4",
+                        "on-tertiary-fixed": "#291713",
+                        "inverse-surface": "#e5e2e1",
+                        "tertiary-container": "#ccaca5",
+                        "on-tertiary-container": "#57403b",
+                        "error-container": "#93000a",
+                        "outline": "#99907c",
+                        "on-secondary-fixed-variant": "#622599",
+                        "on-error-container": "#ffdad6",
+                        "surface-variant": "#353534",
+                        "on-error": "#690005",
+                        "surface-bright": "#393939",
+                        "on-primary-fixed": "#241a00",
+                        "on-secondary-fixed": "#2c0050",
+                        "surface-container-lowest": "#0e0e0e",
+                        "on-secondary-container": "#d1a1ff",
+                        "secondary-fixed": "#f0dbff",
+                        "primary-container": "#d4af37",
+                        "on-background": "#e5e2e1",
+                        "inverse-on-surface": "#313030"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "fontFamily": {
+                        "headline": ["Noto Serif"],
+                        "body": ["Manrope"],
+                        "label": ["Manrope"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            background-color: #131313;
+            color: #e5e2e1;
+            font-family: 'Manrope', sans-serif;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-card {
+            background: rgba(28, 27, 27, 0.6);
+            backdrop-filter: blur(40px);
+        }
+        .gold-glow {
+            box-shadow: 0 0 40px rgba(242, 202, 80, 0.15);
+        }
+        .selected-ring {
+            box-shadow: inset 0 0 0 2px #f2ca50, 0 0 30px rgba(242, 202, 80, 0.3);
+        }
+    </style>
+</head>
+<body class="antialiased overflow-x-hidden">
+<!-- TopAppBar -->
+<nav class="fixed top-0 w-full z-50 flex justify-between items-center px-12 h-20 w-full bg-neutral-950/60 backdrop-blur-xl shadow-[0_8px_32px_0_rgba(212,175,55,0.05)]">
+<div class="text-2xl font-bold tracking-tighter text-[#f2ca50] font-['Noto_Serif']">Maya</div>
+<div class="hidden md:flex items-center gap-10">
+<a class="text-[#f2ca50] border-b-2 border-[#f2ca50] pb-1 font-['Noto_Serif'] text-lg tracking-wide hover:text-[#f2ca50] transition-colors duration-300" href="#">Concierge</a>
+<a class="text-neutral-400 font-medium font-['Noto_Serif'] text-lg tracking-wide hover:text-[#f2ca50] transition-colors duration-300" href="#">Timeline</a>
+<a class="text-neutral-400 font-medium font-['Noto_Serif'] text-lg tracking-wide hover:text-[#f2ca50] transition-colors duration-300" href="#">Inspiration</a>
+</div>
+<div class="flex items-center gap-6">
+<span class="material-symbols-outlined text-neutral-400 cursor-pointer hover:text-primary transition-colors">notifications</span>
+<span class="material-symbols-outlined text-neutral-400 cursor-pointer hover:text-primary transition-colors">settings</span>
+<div class="h-10 w-10 rounded-full bg-surface-container-high border border-outline-variant/30 overflow-hidden">
+<img alt="User profile" class="w-full h-full object-cover" data-alt="Close-up portrait of a sophisticated man in a dark suit against a soft architectural background with elegant lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBBAKRT97W3os04o-tTiPMuKSkzfEQhNML7BG9QUYSvNuUBh5HuCBgmN7b_ZCan148fDQ6tXvyHt9fIMBq_vjnFTFsl-lel2UKmlVmraYgNDyNB9yBmOkHqUmvwkFEZ-rUlFGhLjNXn0ya2NTRbHkcVhcCg5250xOL6JwAKm4f7GcxtTld8iTMuoHJR35t4Fapv8gg7fNKzmDwRkP3hsev_UYF-Q2W0sGMCDnfm29Iuww_S9tvzLT4HqFuM7oeMhxsUW5ze8-PuW8U"/>
+</div>
+</div>
+</nav>
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-20 h-[calc(100vh-5rem)] w-64 bg-[#131313] flex flex-col py-8 gap-4 z-40 hidden md:flex">
+<div class="px-8 mb-8">
+<div class="flex items-center gap-3 mb-2">
+<div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-primary to-primary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary text-sm" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+</div>
+<div>
+<div class="text-on-surface font-bold text-xs uppercase tracking-widest font-['Manrope']">The Loom</div>
+<div class="text-neutral-500 text-[10px] uppercase tracking-tighter">AI Assistant</div>
+</div>
+</div>
+</div>
+<nav class="flex flex-col gap-2">
+<a class="flex items-center gap-4 px-8 py-3 text-neutral-500 font-['Manrope'] text-sm uppercase tracking-widest hover:bg-neutral-800/30 hover:text-neutral-200 transition-all duration-500 ease-in-out" href="#">
+<span class="material-symbols-outlined">castle</span> Hall Decor
+            </a>
+<a class="flex items-center gap-4 px-8 py-3 text-neutral-500 font-['Manrope'] text-sm uppercase tracking-widest hover:bg-neutral-800/30 hover:text-neutral-200 transition-all duration-500 ease-in-out" href="#">
+<span class="material-symbols-outlined">local_florist</span> Floral
+            </a>
+<a class="flex items-center gap-4 px-8 py-3 text-neutral-500 font-['Manrope'] text-sm uppercase tracking-widest hover:bg-neutral-800/30 hover:text-neutral-200 transition-all duration-500 ease-in-out" href="#">
+<span class="material-symbols-outlined">wb_iridescent</span> Lighting
+            </a>
+<a class="flex items-center gap-4 px-8 py-3 text-neutral-500 font-['Manrope'] text-sm uppercase tracking-widest hover:bg-neutral-800/30 hover:text-neutral-200 transition-all duration-500 ease-in-out" href="#">
+<span class="material-symbols-outlined">chair</span> Furniture
+            </a>
+</nav>
+<div class="mt-auto px-8">
+<button class="w-full py-4 bg-surface-container-highest text-primary font-bold text-xs uppercase tracking-[0.2em] rounded-xl border border-primary/10 hover:bg-primary hover:text-on-primary transition-all duration-300">
+                New Concept
+            </button>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="pt-32 pb-40 md:pl-72 px-8 min-h-screen">
+<!-- AI Prompt Section -->
+<header class="max-w-4xl mb-16">
+<div class="flex items-center gap-4 mb-4">
+<span class="h-[1px] w-12 bg-primary/40"></span>
+<span class="text-primary font-body text-sm font-semibold tracking-widest uppercase">Assistant Prompt</span>
+</div>
+<h1 class="font-headline text-4xl md:text-5xl lg:text-6xl text-on-surface leading-tight">
+                "Which of these <span class="italic text-primary">prestigious halls</span> would you like to see your decorations in?"
+            </h1>
+</header>
+<!-- Hall Selection Bento/Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8 max-w-[1400px]">
+<!-- Selected Card: The Grand Lotus Ballroom -->
+<div class="lg:col-span-7 group relative overflow-hidden rounded-xl bg-surface-container-low selected-ring transition-all duration-500 hover:scale-[1.01] hover:shadow-2xl">
+<div class="aspect-[16/10] overflow-hidden">
+<img alt="The Grand Lotus Ballroom" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="Extravagant grand ballroom with massive lotus-shaped crystal chandeliers, ornate gold leaf pillars, and a reflective marble floor under warm amber lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA_PMT3LhArLif3aExiuem3FrZqaqi93opRBEzKp0Kguek-PdwAHKD-4qoh2DjaGvtvefLQmMb_ChC9B31qorUtJ1e6004B-gxdeIRu8fp6Wgz8TNK0Tx5fG6iPxjN98PzUL0R7DzZp-aK-2iCeTczOxBbGDgnFanAckrnBe2jRGhTsrLkif-sQReu5yrFep1Hu08mvvFZxDkpEi1xvYIB6jGF0dCK7GuFQDpjzALExzFV3Ym0PB4Gcjec0oVCF363_G9FXXToJwvQ"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent"></div>
+</div>
+<div class="absolute bottom-0 left-0 w-full p-8 flex flex-col gap-4">
+<div class="flex items-center justify-between">
+<span class="px-4 py-1 bg-primary text-on-primary text-[10px] font-bold uppercase tracking-widest rounded-full">Lush Heritage</span>
+<div class="flex items-center gap-2 text-primary">
+<span class="material-symbols-outlined fill text-sm" style="font-variation-settings: 'FILL' 1;">stars</span>
+<span class="text-[10px] font-bold uppercase tracking-widest">Selected</span>
+</div>
+</div>
+<div>
+<h2 class="font-headline text-3xl text-on-surface mb-2">The Grand Lotus Ballroom</h2>
+<div class="flex items-center gap-6 text-neutral-400 text-sm">
+<span class="flex items-center gap-2"><span class="material-symbols-outlined text-sm">groups</span> 800+ Capacity</span>
+<span class="flex items-center gap-2"><span class="material-symbols-outlined text-sm">auto_awesome</span> Majestic Ambience</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Side Cards Column -->
+<div class="lg:col-span-5 flex flex-col gap-8">
+<!-- Amaravathi Palace Hall -->
+<div class="group relative overflow-hidden rounded-xl bg-surface-container-low transition-all duration-500 hover:scale-[1.02] hover:gold-glow">
+<div class="aspect-[16/9] overflow-hidden">
+<img alt="Amaravathi Palace Hall" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="Interior of a traditional Indian palace hall with carved stone arches, dark teak wood ceilings, and vibrant silk drapes in royal purple and gold" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCUg4OB96MB5MrU0aG0qFKFhw06dYt6n2kj522RvAPDkH7HvXP6LqHQVUsZVHN1DI58qCd5y8y-Qo5gq4JYuLmilmWU4QRT0c9NLgYItXOhSv8_w15g_QMh6snw67wFpyyniY8Z8tga0tr1jSHGubjWhcKREhNgcxYfQo19akzVK3i_cmcSrxLVZ6ThMDXQaQ1HgfYVGCFVEAA0dQ5c3ObPZugA9KXDNxM4BFxjcqXduSSIzkv9aKpnB23wMcMbzUAHpITplkIcpUs"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/10 to-transparent"></div>
+</div>
+<div class="absolute bottom-0 left-0 w-full p-6">
+<span class="inline-block px-3 py-1 border border-primary/30 text-primary text-[9px] font-bold uppercase tracking-widest rounded-full mb-3">Royal Classic</span>
+<h3 class="font-headline text-2xl text-on-surface mb-1">Amaravathi Palace Hall</h3>
+<div class="flex items-center gap-4 text-neutral-400 text-xs">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-xs">groups</span> 450 Capacity</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-xs">history_edu</span> Regal Soul</span>
+</div>
+</div>
+</div>
+<!-- The Sky Pavilion -->
+<div class="group relative overflow-hidden rounded-xl bg-surface-container-low transition-all duration-500 hover:scale-[1.02] hover:gold-glow">
+<div class="aspect-[16/9] overflow-hidden">
+<img alt="The Sky Pavilion" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="Modern rooftop wedding venue with floor-to-ceiling glass walls, minimalist decor, and a panoramic view of a city skyline at dusk" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCs9uarK2xk1ahE_2-bk5oIpY-cAcvtouOiD0KatcTS3SjhvF4Dm8417WbAIJwxki92iW5Q3zF0ipLgD7BXWQg2ETCyLhU0n8IIMVFpMzeuQwyO8OLpo6jnimz8VBbqmeih1IRKVI2tVH6FrjtuKdLoBk-LMf38sQWJNYzxh3nfc2pxIe93c7K_6XbfeqEtrUj_2oUW6eJTOKuKPmkfmNjsuFdwIHIetDVEgOwJUAHclB7ejKiWaTC_UXMJXGGE5OVKdIQ1XJZIjNs"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/10 to-transparent"></div>
+</div>
+<div class="absolute bottom-0 left-0 w-full p-6">
+<span class="inline-block px-3 py-1 border border-secondary/30 text-secondary text-[9px] font-bold uppercase tracking-widest rounded-full mb-3">Modern Ethereal</span>
+<h3 class="font-headline text-2xl text-on-surface mb-1">The Sky Pavilion</h3>
+<div class="flex items-center gap-4 text-neutral-400 text-xs">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-xs">groups</span> 300 Capacity</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-xs">light_mode</span> Airy &amp; Fluid</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar (Floating Voice Control Shell) -->
+<div class="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 flex items-center gap-6 md:gap-12 bg-neutral-900/80 backdrop-blur-2xl rounded-full px-10 py-5 border border-white/10 shadow-[0_20px_50px_rgba(74,0,128,0.1)]">
+<div class="flex flex-col items-center justify-center text-neutral-400 hover:text-white transition-all cursor-pointer group">
+<span class="material-symbols-outlined mb-1 group-hover:scale-110 transition-transform">mic_off</span>
+<span class="font-['Manrope'] text-[10px] font-semibold tracking-tighter uppercase">Mute</span>
+</div>
+<div class="flex flex-col items-center justify-center text-neutral-400 hover:text-white transition-all cursor-pointer group">
+<span class="material-symbols-outlined mb-1 group-hover:scale-110 transition-transform">dashboard</span>
+<span class="font-['Manrope'] text-[10px] font-semibold tracking-tighter uppercase">Moodboard</span>
+</div>
+<!-- Active Ask Maya Button -->
+<div class="flex flex-col items-center justify-center bg-gradient-to-tr from-[#f2ca50] to-[#d4af37] text-neutral-950 rounded-full w-20 h-20 -mt-2 scale-110 shadow-lg shadow-primary/20 cursor-pointer active:scale-95 transition-all duration-300">
+<span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+<span class="font-['Manrope'] text-[9px] font-extrabold tracking-tighter uppercase mt-1">Ask Maya</span>
+</div>
+<div class="flex flex-col items-center justify-center text-neutral-400 hover:text-white transition-all cursor-pointer group">
+<span class="material-symbols-outlined mb-1 group-hover:scale-110 transition-transform">forum</span>
+<span class="font-['Manrope'] text-[10px] font-semibold tracking-tighter uppercase">Live Transcript</span>
+</div>
+<div class="flex flex-col items-center justify-center text-error hover:text-red-400 transition-all cursor-pointer group">
+<span class="material-symbols-outlined mb-1 group-hover:scale-110 transition-transform">call_end</span>
+<span class="font-['Manrope'] text-[10px] font-semibold tracking-tighter uppercase">End Session</span>
+</div>
+</div>
+<!-- AI Transcription Layer (Contextual) -->
+<div class="fixed bottom-32 left-1/2 -translate-x-1/2 w-full max-w-lg px-6 pointer-events-none">
+<div class="bg-surface-container-high/40 backdrop-blur-xl border border-white/5 rounded-2xl p-4 text-center">
+<div class="flex justify-center items-center gap-1 mb-2">
+<span class="h-1 w-4 bg-secondary rounded-full"></span>
+<span class="h-2 w-8 bg-secondary/80 rounded-full"></span>
+<span class="h-1 w-6 bg-secondary/60 rounded-full"></span>
+</div>
+<p class="text-neutral-300 font-body text-sm italic">"Maya, show me the Grand Lotus with more gold floral hangings..."</p>
+</div>
+</div>
+</body></html>

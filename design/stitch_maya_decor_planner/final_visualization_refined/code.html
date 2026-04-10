@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Maya - Grand Lotus Ballroom Visualization</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;700&amp;family=Manrope:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "primary-fixed-dim": "#e9c349",
+                    "outline-variant": "#4d4635",
+                    "surface-container-high": "#2a2a2a",
+                    "tertiary": "#e9c7c0",
+                    "secondary": "#ddb7ff",
+                    "on-primary-container": "#554300",
+                    "background": "#131313",
+                    "surface-container": "#201f1f",
+                    "surface-container-low": "#1c1b1b",
+                    "inverse-primary": "#735c00",
+                    "on-primary": "#3c2f00",
+                    "secondary-fixed-dim": "#ddb7ff",
+                    "secondary-container": "#622599",
+                    "surface-dim": "#131313",
+                    "tertiary-fixed-dim": "#e0bfb8",
+                    "surface-tint": "#e9c349",
+                    "on-tertiary": "#402b27",
+                    "surface": "#131313",
+                    "on-tertiary-fixed-variant": "#59413c",
+                    "on-secondary": "#4a0080",
+                    "on-surface-variant": "#d0c5af",
+                    "primary": "#f2ca50",
+                    "on-primary-fixed-variant": "#574500",
+                    "error": "#ffb4ab",
+                    "surface-container-highest": "#353534",
+                    "on-surface": "#e5e2e1",
+                    "primary-fixed": "#ffe088",
+                    "tertiary-fixed": "#fedbd4",
+                    "on-tertiary-fixed": "#291713",
+                    "inverse-surface": "#e5e2e1",
+                    "tertiary-container": "#ccaca5",
+                    "on-tertiary-container": "#57403b",
+                    "error-container": "#93000a",
+                    "outline": "#99907c",
+                    "on-secondary-fixed-variant": "#622599",
+                    "on-error-container": "#ffdad6",
+                    "surface-variant": "#353534",
+                    "on-error": "#690005",
+                    "surface-bright": "#393939",
+                    "on-primary-fixed": "#241a00",
+                    "on-secondary-fixed": "#2c0050",
+                    "surface-container-lowest": "#0e0e0e",
+                    "on-secondary-container": "#d1a1ff",
+                    "secondary-fixed": "#f0dbff",
+                    "primary-container": "#d4af37",
+                    "on-background": "#e5e2e1",
+                    "inverse-on-surface": "#313030"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "fontFamily": {
+                    "headline": ["Noto Serif"],
+                    "body": ["Manrope"],
+                    "label": ["Manrope"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Manrope', sans-serif; background-color: #131313; color: #e5e2e1; }
+        .font-serif { font-family: 'Noto Serif', serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .glass-panel { backdrop-filter: blur(40px); background: rgba(19, 19, 19, 0.6); }
+        .hero-gradient { background: linear-gradient(to bottom, rgba(19,19,19,0) 0%, rgba(19,19,19,0.8) 100%); }
+        .gold-glow { box-shadow: 0 0 50px rgba(242, 202, 80, 0.1); }
+    </style>
+</head>
+<body class="overflow-hidden">
+<!-- Top Navigation (Shell) -->
+<nav class="fixed top-0 w-full z-50 bg-neutral-950/60 backdrop-blur-xl flex justify-between items-center px-12 h-20 w-full shadow-[0_8px_32px_0_rgba(212,175,55,0.05)]">
+<div class="text-2xl font-bold tracking-tighter text-[#f2ca50] font-['Noto_Serif']">Maya</div>
+<div class="hidden md:flex items-center gap-8">
+<a class="text-neutral-400 font-medium font-['Noto_Serif'] text-lg tracking-wide hover:text-[#f2ca50] transition-colors duration-300" href="#">Concierge</a>
+<a class="text-neutral-400 font-medium font-['Noto_Serif'] text-lg tracking-wide hover:text-[#f2ca50] transition-colors duration-300" href="#">Timeline</a>
+<a class="text-[#f2ca50] border-b-2 border-[#f2ca50] pb-1 font-['Noto_Serif'] text-lg tracking-wide" href="#">Inspiration</a>
+</div>
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-neutral-400 hover:text-[#f2ca50] transition-colors">notifications</button>
+<button class="material-symbols-outlined text-neutral-400 hover:text-[#f2ca50] transition-colors">settings</button>
+<div class="w-10 h-10 rounded-full border border-[#f2ca50]/30 overflow-hidden">
+<img alt="User profile" class="w-full h-full object-cover" data-alt="portrait of a professional woman with a warm smile in cinematic lighting soft focus background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC7ITmkOFbwbSFyQBy_V3-Q1mgG-yF1zUnQfUXma-wKwK7Ita0r2qXEQFnQKTyctFUeEmkIWWHJZZ-DL_OQCm8vBRquFuX6vIhgNZmBOe1r5MTpsnVIjhl7kXK8TNxqZXkwXO12vkUf128hlvww7_Q6EiZtBcJcEKGJl4QT5NJ2LQoU7umYcB_4waTcvA1KqS35Zp73gsM3kixNDltv4L-bZfMk3asN6w4zPd18nyiU1DBIVimg3SO3m80H1m_1jXsMyuQ_6OeTybc"/>
+</div>
+</div>
+</nav>
+<!-- Main Canvas -->
+<main class="relative h-screen w-screen pt-20">
+<!-- Full Screen Hero Visualization -->
+<div class="absolute inset-0 z-0">
+<img alt="Grand Lotus Ballroom" class="w-full h-full object-cover" data-alt="opulent grand ballroom decorated for a luxury indian wedding with heavy gold silk drapes marigold garlands and massive crystal chandeliers warm cinematic lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAszsMEmrNHJ_NVgLPcvN1IrqmatOc5pwRypQrFys1p4WJdPE5kKOb7jBrhRsBRoilTCS1PtvDh8gCm9d7Y-vAQ-wP0f6xZy2Ju6uzfmMfPWb0TgtPPJ2HBuEwED4V_TeWJHB7tO37Oz_WCDs8tQDFfwnP_czclrgc_mqH3GAxOB81gXDtbcbBwXjcdOm7n7kvxnBHJdLRLHszwlix1t9RM3v63wApwqQ3O7E9wjS1FWLUUglRoQ1zROXfklyoWmlwvJTp4rqeKAD0"/>
+<div class="absolute inset-0 hero-gradient"></div>
+<!-- Lighting Overlays for Depth -->
+<div class="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-[120px]"></div>
+<div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-secondary-container/10 rounded-full blur-[150px]"></div>
+</div>
+<!-- Left Summary Sidebar (The Loom) -->
+<aside class="fixed left-8 top-32 z-20 w-80 flex flex-col gap-6">
+<div class="glass-panel p-8 rounded-xl border border-white/5 gold-glow">
+<div class="flex items-center gap-3 mb-8">
+<div class="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-xl">castle</span>
+</div>
+<div>
+<h2 class="font-serif text-xl text-primary font-bold tracking-tight">Grand Lotus Ballroom</h2>
+<p class="font-label text-[10px] uppercase tracking-[0.2em] text-neutral-500">Visualization Phase</p>
+</div>
+</div>
+<div class="space-y-6">
+<div>
+<p class="font-label text-[10px] uppercase tracking-widest text-neutral-500 mb-3">Core Decor Palette</p>
+<div class="space-y-3">
+<div class="flex items-center justify-between text-sm">
+<span class="text-on-surface/80">Kanjeevaram Silk Drapes</span>
+<span class="text-primary font-semibold">Gold Leaf</span>
+</div>
+<div class="flex items-center justify-between text-sm">
+<span class="text-on-surface/80">Floral Installation</span>
+<span class="text-primary font-semibold">Fresh Marigold</span>
+</div>
+<div class="flex items-center justify-between text-sm">
+<span class="text-on-surface/80">Ceiling Feature</span>
+<span class="text-primary font-semibold">Crystal Cascades</span>
+</div>
+</div>
+</div>
+<div class="pt-6 border-t border-white/5">
+<p class="font-label text-[10px] uppercase tracking-widest text-neutral-500 mb-3">Atmospheric Tone</p>
+<div class="flex gap-2">
+<div class="px-3 py-1 rounded-full bg-surface-container-high text-[10px] font-bold text-tertiary">CINEMATIC</div>
+<div class="px-3 py-1 rounded-full bg-surface-container-high text-[10px] font-bold text-secondary">ROYAL</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Maya Subtle Presence -->
+<div class="glass-panel p-4 rounded-full flex items-center gap-4 border border-white/5 gold-glow">
+<div class="relative w-10 h-10 flex items-center justify-center">
+<div class="absolute inset-0 bg-primary/20 rounded-full animate-pulse"></div>
+<span class="material-symbols-outlined text-primary text-2xl" data-weight="fill">auto_awesome</span>
+</div>
+<div>
+<p class="text-xs font-semibold text-on-surface">Maya is observing</p>
+<p class="text-[10px] text-neutral-500">"This composition feels harmonious."</p>
+</div>
+</div>
+</aside>
+<!-- Centered Visualization Label -->
+<div class="absolute bottom-40 left-1/2 -translate-x-1/2 text-center pointer-events-none">
+<h1 class="font-serif text-5xl md:text-7xl font-bold tracking-tight text-on-surface mb-4 drop-shadow-2xl">Refinement 04</h1>
+<div class="inline-block px-4 py-1 rounded-full border border-primary/30 bg-primary/10 backdrop-blur-md">
+<span class="text-xs font-bold tracking-[0.3em] text-primary uppercase">Production Quality Render</span>
+</div>
+</div>
+<!-- Floating Action Cluster (Custom Bottom Bar) -->
+<div class="fixed bottom-10 left-1/2 -translate-x-1/2 z-40 flex items-center gap-4 px-6 py-4 glass-panel rounded-full border border-white/10 shadow-[0_20px_50px_rgba(74,0,128,0.1)]">
+<button class="flex items-center gap-2 px-6 py-3 rounded-full hover:bg-white/5 transition-all text-neutral-400 hover:text-white font-label text-sm">
+<span class="material-symbols-outlined text-xl">refresh</span>
+                Regenerate
+            </button>
+<button class="flex items-center gap-2 px-6 py-3 rounded-full hover:bg-white/5 transition-all text-neutral-400 hover:text-white font-label text-sm">
+<span class="material-symbols-outlined text-xl">castle</span>
+                Change Hall
+            </button>
+<button class="flex items-center gap-2 px-6 py-3 rounded-full hover:bg-white/5 transition-all text-neutral-400 hover:text-white font-label text-sm">
+<span class="material-symbols-outlined text-xl">edit_note</span>
+                Edit Decor
+            </button>
+<div class="w-px h-8 bg-white/10 mx-2"></div>
+<button class="flex items-center gap-3 px-8 py-3 bg-gradient-to-tr from-[#f2ca50] to-[#d4af37] text-neutral-950 font-bold rounded-full shadow-lg shadow-primary/20 hover:scale-105 active:scale-95 transition-all duration-300 font-label text-sm uppercase tracking-wider">
+<span class="material-symbols-outlined text-xl" style="font-variation-settings: 'FILL' 1;">download</span>
+                Export High-Res
+            </button>
+</div>
+<!-- Maya Mini-Waveform (Contextual UI) -->
+<div class="fixed right-12 bottom-12 z-50 flex items-end gap-1 h-8">
+<div class="w-1.5 h-4 bg-primary rounded-full animate-pulse opacity-60"></div>
+<div class="w-1.5 h-8 bg-secondary rounded-full animate-bounce opacity-80"></div>
+<div class="w-1.5 h-6 bg-tertiary rounded-full animate-pulse"></div>
+<div class="w-1.5 h-10 bg-primary rounded-full animate-bounce opacity-70"></div>
+<div class="w-1.5 h-5 bg-secondary-container rounded-full animate-pulse opacity-50"></div>
+</div>
+</main>
+<!-- Side Navigation (Suppressed per rule, but included contextually for depth if required - Hidden here as per UX goals for 'Visual Impressive' focus) -->
+<div class="hidden">
+<div class="style_bg_color style_component_shape style_shell_layout">
+<!-- Sidebar Content suppressed to prioritize the full-screen canvas -->
+</div>
+</div>
+</body></html>

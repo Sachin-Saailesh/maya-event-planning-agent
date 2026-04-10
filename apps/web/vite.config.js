@@ -6,10 +6,11 @@ export default defineConfig({
   server: {
     port: 5173,
     proxy: {
-      "/session": "http://localhost:8000",
-      "/tts": "http://localhost:8000",
+      "/session": "http://127.0.0.1:8000",
+      "/generate": "http://127.0.0.1:8000",
+      "/tts": "http://127.0.0.1:8000",
       "/ws": {
-        target: "ws://localhost:8000",
+        target: "ws://127.0.0.1:8000",
         ws: true,
       },
     },

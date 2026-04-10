@@ -74,10 +74,22 @@ def set_nested(state: dict[str, Any], dotted_path: str, value: Any) -> None:
 
 def validate_backdrop_types(types: list[str]) -> list[str]:
     """Return only valid backdrop types, raise on invalid."""
-    invalid = [t for t in types if t not in BACKDROP_ALLOWED_TYPES]
+    normalized_types = []
+    for t in types:
+        t_lower = t.lower()
+        if "light" in t_lower:
+            normalized_types.append("flower_lights")
+        elif "flower" in t_lower:
+            normalized_types.append("flowers")
+        elif "pattern" in t_lower:
+            normalized_types.append("pattern")
+        else:
+            normalized_types.append(t)
+            
+    invalid = [t for t in normalized_types if t not in BACKDROP_ALLOWED_TYPES]
     if invalid:
         raise ValueError(f"Invalid backdrop types: {invalid}. Allowed: {sorted(BACKDROP_ALLOWED_TYPES)}")
-    return types
+    return list(set(normalized_types))
 
 
 def slot_is_filled(state: dict[str, Any], slot: str) -> bool:

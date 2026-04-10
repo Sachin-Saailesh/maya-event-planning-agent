@@ -99,8 +99,8 @@ GREETING = (
 )
 
 COMPLETION_MESSAGE = (
-    "That covers everything! Your decoration brief is ready. "
-    "Would you like to change anything, or shall we wrap up the session?"
+    "These are the props you chose. Would you like to modify any of that, "
+    "or shall we proceed to the image generation?"
 )
 
 SESSION_ENDED_MESSAGE = (
@@ -130,6 +130,32 @@ END_SESSION_PHRASES = {
     "end", "end session", "stop", "finish", "done", "wrap up", "that's all",
     "that is all", "close", "goodbye", "bye", "exit", "quit", "no changes",
     "no change", "no thank you", "no thanks", "nothing", "all good", "looks good",
+}
+
+# Phrases that signal the user wants Maya to repeat the last question
+REPEAT_PHRASES = {
+    # Direct requests
+    "repeat", "say that again", "can you repeat", "repeat that", "repeat please",
+    "what did you say", "what was that", "what?", "huh?", "sorry?", "pardon?",
+    # Polite variants
+    "can you say that again", "could you repeat that", "please repeat",
+    "i didn't hear you", "i couldn't hear", "say again", "one more time",
+    "come again", "i missed that", "didn't catch that",
+    # With apologies (common voice pattern)
+    "sorry can you repeat", "sorry what", "sorry say that again",
+    "i'm sorry can you repeat", "i'm sorry what", "sorry i didn't catch that",
+    "pardon me",
+}
+
+# Common Whisper hallucinations on near-silence audio.
+# These are filtered at the orchestrator level as a second line of defence
+# (first line is the VAD min_speech_ms guard in the worker).
+WHISPER_HALLUCINATION_BLOCKLIST = {
+    "you", "you.", "you!", "uh", "um", "hmm", "hm",
+    "thank you", "thank you.", "thanks", "thanks.",
+    "okay", "ok", "yes", "no",  # single-word noise triggers
+    "the", "a", "an", "is", "it", "in", "on", "at",
+    "mayo", "maya",  # common mic pickup of TTS leakage
 }
 
 
@@ -162,6 +188,40 @@ def is_end_session_intent(text: str) -> bool:
     """Return True if the user is signalling they want to end the session."""
     normalized = text.lower().strip().rstrip("!.").strip()
     return normalized in END_SESSION_PHRASES
+
+
+def is_repeat_request(text: str) -> bool:
+    """
+    Return True if the user is asking Maya to repeat the last question.
+    Checks both exact matches and substring containment for natural phrasing.
+    """
+    normalized = text.lower().strip().rstrip("!?.").strip()
+    # Exact match first (fast path)
+    if normalized in REPEAT_PHRASES:
+        return True
+    # Substring match for longer utterances like "I'm sorry, can you repeat that?"
+    for phrase in REPEAT_PHRASES:
+        if phrase in normalized:
+            return True
+    return False
+
+
+def is_whisper_hallucination(text: str) -> bool:
+    """
+    Return True if the transcript looks like a Whisper hallucination.
+    These are single-word or very short strings that Whisper produces
+    when transcribing near-silence or background noise audio.
+    Also filter out common whisper spam like youtube links or .com domains.
+    """
+    normalized = text.strip().lower().rstrip("!?.,").strip()
+    
+    if normalized in WHISPER_HALLUCINATION_BLOCKLIST:
+        return True
+    
+    if any(phrase in normalized for phrase in [".com", "www.", "subscribe", "thanks for watching", "learn more at"]):
+        return True
+        
+    return False
 
 
 def format_confirmation(values: list[str]) -> str:
@@ -263,6 +323,15 @@ def process_user_input(
             "next_prompt": prompt,
         }
 
+    # Slots where a bare confirmation means "yes, I want that"
+    # (boolean-style questions where the answer is effectively yes/no)
+    AFFIRMATIVE_SLOTS = {
+        "entrance_decor.name_board",
+        "entrance_decor.garlands",
+        "chandeliers",
+        "selfie_booth_decor",
+    }
+
     # Handle deny/skip
     if intent == "deny" and not values:
         next_slot = _advance_slot(state, slot)
@@ -277,16 +346,21 @@ def process_user_input(
 
     # Handle acknowledgment / confirmation with no values
     if intent in ("acknowledgment", "confirm") and not values:
-        return {
-            "patch_ops": [],
-            "confirmation_text": "",
-            "needs_confirmation": False,
-            "confirmation_request": None,
-            "next_slot": slot,
-            "next_prompt": f"Great! So, {get_slot_prompt(slot)}",
-        }
+        # For boolean-style slots, a bare "yes/sure/okay" means they want it
+        if slot in AFFIRMATIVE_SLOTS:
+            values = ["yes"]
+            # Fall through to the normal set path below
+        else:
+            return {
+                "patch_ops": [],
+                "confirmation_text": "",
+                "needs_confirmation": False,
+                "confirmation_request": None,
+                "next_slot": slot,
+                "next_prompt": f"Got it! {get_slot_prompt(slot)}",
+            }
 
-    # No values extracted
+    # No values extracted — re-prompt with context
     if not values:
         return {
             "patch_ops": [],
@@ -294,9 +368,7 @@ def process_user_input(
             "needs_confirmation": False,
             "confirmation_request": None,
             "next_slot": slot,
-            "next_prompt": (
-                f"I didn't quite catch that. {get_slot_prompt(slot)}"
-            ),
+            "next_prompt": f"I didn't quite catch that. {get_slot_prompt(slot)}",
         }
 
     # Validate backdrop types
@@ -304,7 +376,6 @@ def process_user_input(
         try:
             values = validate_backdrop_types(values)
         except ValueError:
-            valid = ", ".join(sorted(SLOT_PROMPTS.keys()))
             return {
                 "patch_ops": [],
                 "confirmation_text": "",
@@ -388,6 +459,85 @@ def _advance_slot(state: dict[str, Any], current_slot: str) -> str | None:
         if not slot_is_filled(state, s):
             return s
     return None
+
+
+# ── Review-stage intent parsing ────────────────────────────────
+
+REVIEW_PROCEED_PHRASES = [
+    "proceed to image", "proceed to generation", "proceed to hall",
+    "let's proceed", "let's go", "looks good proceed", "go ahead",
+    "ready to proceed", "ready", "generate", "let's generate",
+    "image generation", "i'm ready", "im ready", "next step",
+    "proceed", "let's move", "continue", "go forward",
+]
+
+REVIEW_MODIFY_GENERIC_PHRASES = [
+    "want to modify", "i want to modify", "want to change", "i want to change",
+    "modify these", "change these", "modify props", "change props",
+    "modify selections", "change selections", "edit selections",
+    "go back and", "want to edit", "i want to edit", "modify",
+]
+
+# Slot aliases for voice-driven slot targeting
+REVIEW_SLOT_ALIASES: dict[str, set[str]] = {
+    "primary_colors":                     {"color", "colours", "colors", "palette", "theme color", "primary colors", "colour scheme"},
+    "types_of_flowers":                   {"flowers", "flower", "floral", "florals"},
+    "backdrop_decor.types":               {"backdrop", "stage background", "background", "stage backdrop"},
+    "decor_lights":                       {"lights", "lighting", "light"},
+    "chandeliers":                        {"chandelier", "chandeliers"},
+    "entrance_decor.foyer":               {"foyer", "entrance foyer"},
+    "entrance_decor.garlands":            {"garlands", "garland"},
+    "entrance_decor.name_board":          {"name board", "nameboard", "welcome board"},
+    "entrance_decor.top_decor_at_entrance":{"top decor", "entrance canopy", "entrance top"},
+    "props":                              {"props", "traditional props"},
+    "selfie_booth_decor":                 {"selfie booth", "photo booth", "selfie", "photobooth"},
+    "hall_decor":                         {"hall decor", "hall decoration", "centrepieces", "centerpieces"},
+}
+
+MODIFY_VERBS = {"modify", "change", "edit", "update", "fix", "adjust", "redo", "different"}
+
+
+def parse_review_intent(text: str) -> dict[str, Any]:
+    """
+    Parse a user utterance when all slots are filled (review / completion stage).
+    Called instead of generic NLU when current_slot is None.
+
+    Returns: { "intent": "proceed" | "modify_slot" | "modify_generic" | "end" | "other",
+               "slot": str | None }
+    """
+    lower = text.lower().strip().rstrip("!.?")
+
+    # Proceed intents — check first so "let's proceed" doesn't match modify
+    for phrase in REVIEW_PROCEED_PHRASES:
+        if phrase in lower:
+            return {"intent": "proceed", "slot": None}
+
+    # Slot-specific modify (needs a modify verb + a slot alias)
+    has_verb = any(v in lower for v in MODIFY_VERBS)
+    for slot, aliases in REVIEW_SLOT_ALIASES.items():
+        for alias in aliases:
+            if alias in lower:
+                if has_verb or any(w in lower for w in ("want", "would like", "like to", "need to")):
+                    return {"intent": "modify_slot", "slot": slot}
+
+    # Generic modify
+    for phrase in REVIEW_MODIFY_GENERIC_PHRASES:
+        if phrase in lower:
+            return {"intent": "modify_generic", "slot": None}
+
+    # End/done
+    if is_end_session_intent(text):
+        return {"intent": "end", "slot": None}
+
+    return {"intent": "other", "slot": None}
+
+
+def get_review_modify_prompt() -> str:
+    return (
+        "Sure! Which part would you like to change? "
+        "Colors, flowers, backdrop, entrance decor, lighting, "
+        "chandeliers, selfie booth, props, or hall decor?"
+    )
 
 
 def generate_summary_text(state: dict[str, Any]) -> str:

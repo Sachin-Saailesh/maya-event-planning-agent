@@ -135,7 +135,14 @@ class AgentWorker:
                 # Combine buffer and transcribe
                 all_audio = b"".join(self._audio_buffer)
                 self._audio_buffer = []
-                asyncio.create_task(self._transcribe_and_send(all_audio, frame.sample_rate, frame.num_channels))
+                # Minimum duration guard: skip very short audio clips (< 0.5s)
+                # These are almost always noise bursts, not real speech.
+                # At 16kHz 16-bit mono: 0.5s = 16000 samples * 2 bytes = 16000 bytes
+                min_bytes = int(0.5 * frame.sample_rate * 2 * frame.num_channels)
+                if len(all_audio) < min_bytes:
+                    logger.info(f"[VAD] Skipping short audio buffer ({len(all_audio)} bytes < {min_bytes} min)")
+                else:
+                    asyncio.create_task(self._transcribe_and_send(all_audio, frame.sample_rate, frame.num_channels))
 
     async def _transcribe_and_send(self, pcm_data: bytes, sample_rate: int, num_channels: int):
         """Convert PCM to WAV, transcribe with Whisper, send to orchestrator."""
@@ -152,8 +159,10 @@ class AgentWorker:
             # Send partial indicator
             await self._send_event("client.transcript.partial", {"text": "..."})
 
-            # Transcribe
-            text = await transcribe(wav_bytes)
+            # Transcribe with a domain hint prompt to reduce hallucinations
+            # Whisper commonly hallucinates "you", "thank you", "thanks" etc. on
+            # near-silence audio. A prompt biases it toward domain vocabulary.
+            text = await transcribe(wav_bytes, prompt="Wedding decoration planning: colors, flowers, lights, backdrop, entrance.")
 
             if text and text.strip():
                 logger.info(f"Transcript: {text}")

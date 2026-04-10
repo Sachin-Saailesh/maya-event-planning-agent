@@ -15,4 +15,6 @@ livekit-api>=0.8.0
 redis>=5.0.0
 # Optional: ChromaDB for RAG long-term memory
 chromadb>=0.4.0
+# Google Generative AI — new unified SDK (replaces deprecated google-generativeai)
+google-genai>=1.0.0
 

@@ -29,7 +29,7 @@ class VoiceActivityDetector:
         # Lowered from 0.04 to 0.005 because Chrome's autoGainControl heavily
         # compresses mic audio, producing much lower amplitude values.
         self.energy_threshold = energy_threshold or float(os.getenv("VAD_ENERGY_THRESHOLD", "0.005"))
-        self.silence_duration_ms = silence_duration_ms or int(os.getenv("VAD_SILENCE_MS", "700"))
+        self.silence_duration_ms = silence_duration_ms or int(os.getenv("VAD_SILENCE_MS", "900"))
         self.sample_rate = sample_rate
         self.frame_duration_ms = frame_duration_ms
 
@@ -38,8 +38,11 @@ class VoiceActivityDetector:
         self._speech_ms = 0.0
         self._frame_count = 0
         
-        # Require 100ms of continuous speech to trigger speech_start.
-        self._min_speech_ms = 100.0
+        # Require 300ms of continuous speech before triggering speech_start.
+        # 100ms was too short — background noise (fans, AC, keyboard clicks) could
+        # sustain energy above the threshold for ~100ms, which triggered Whisper
+        # transcription that hallucinated text from near-silence audio.
+        self._min_speech_ms = float(os.getenv("VAD_MIN_SPEECH_MS", "300"))
 
     def process_frame(self, pcm_data: bytes, duration_ms: float = 10.0) -> Optional[str]:
         """

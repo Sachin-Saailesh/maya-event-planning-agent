@@ -14,6 +14,9 @@ export function useWebSocket(sessionId) {
   const [promptChunks, setPromptChunks] = useState([]);
   const [guardrailBlocked, setGuardrailBlocked] = useState(null);
   const [speechInterrupted, setSpeechInterrupted] = useState(null);
+  const [slotsFilledEvent, setSlotsFilledEvent] = useState(null);
+  const [reviewProceedEvent, setReviewProceedEvent] = useState(null);
+  const [reviewModifySlotEvent, setReviewModifySlotEvent] = useState(null);
   const wsRef = useRef(null);
   const reconnectAttempts = useRef(0);
   const reconnectTimerRef = useRef(null);
@@ -161,6 +164,21 @@ export function useWebSocket(sessionId) {
         if (payload.transcript) setTranscript(payload.transcript);
         break;
 
+      case 'server.slots.filled':
+        setSlotsFilledEvent(Date.now());
+        break;
+
+      case 'server.review.proceed':
+        setReviewProceedEvent(Date.now());
+        break;
+
+      case 'server.review.modify_slot':
+        // Backend cleared the slot and set current_slot.
+        // State patch arrives via server.state.patch; this event tells the
+        // frontend to return to the session stage.
+        setReviewModifySlotEvent(Date.now());
+        break;
+
       case 'server.summary.ready':
         break;
 
@@ -248,6 +266,9 @@ export function useWebSocket(sessionId) {
     promptChunks,
     guardrailBlocked,
     speechInterrupted,
+    slotsFilledEvent,
+    reviewProceedEvent,
+    reviewModifySlotEvent,
     sendTranscript,
     sendStateUpdate,
     sendConfirmation,

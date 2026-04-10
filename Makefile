@@ -5,10 +5,10 @@
 dev: dev-orchestrator dev-worker dev-web
 
 dev-orchestrator:
-	cd services/orchestrator && python -m uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+	cd services/orchestrator && python3 -m uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 
 dev-worker:
-	cd services/agent_worker && python -m worker
+	cd services/agent_worker && python3 worker.py dev
 
 dev-web:
 	cd apps/web && npm run dev
@@ -24,20 +24,20 @@ docker-down:
 # ─── Quality ─────────────────────────────────────────────────────
 
 lint:
-	cd services/orchestrator && python -m ruff check .
-	cd services/agent_worker && python -m ruff check .
+	cd services/orchestrator && python3 -m ruff check .
+	cd services/agent_worker && python3 -m ruff check .
 	cd apps/web && npm run lint
 
 test:
-	python -m pytest packages/schema/tests/ -v
-	python -m pytest services/orchestrator/tests/ -v
+	python3 -m pytest packages/schema/tests/ -v
+	python3 -m pytest services/orchestrator/tests/ -v
 
 # ─── Setup ───────────────────────────────────────────────────────
 
 install:
-	pip install -e packages/schema
-	pip install -r services/orchestrator/requirements.txt
-	pip install -r services/agent_worker/requirements.txt
+	pip3 install -e packages/schema
+	pip3 install -r services/orchestrator/requirements.txt
+	pip3 install -r services/agent_worker/requirements.txt
 	cd apps/web && npm install
 
 # ─── Export ──────────────────────────────────────────────────────

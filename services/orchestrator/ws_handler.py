@@ -27,12 +27,14 @@ from conversation import (
     get_slot_prompt,
     process_user_input,
     resolve_confirmation,
-    generate_summary_text,
     COMPLETION_MESSAGE,
     SESSION_ENDED_MESSAGE,
     is_polite_phrase,
     get_polite_response,
-    is_end_session_intent,
+    is_repeat_request,
+    is_whisper_hallucination,
+    parse_review_intent,
+    get_review_modify_prompt,
 )
 from nlu import get_parser
 from guardrails import check_input, check_output, get_guardrail_message
@@ -115,6 +117,13 @@ async def handle_ws_session(websocket: WebSocket, session_id: str, mgr: SessionM
 
                 text = guard_result.filtered_text.strip()  # PII-redacted
                 
+                # ── Hallucination filter (second-line after VAD guard) ──────
+                # Whisper can still produce hallucinations like "you" or "mayo"
+                # from TTS leakage or very short background noise bursts.
+                if is_whisper_hallucination(text):
+                    logger.info(f"[GUARDRAIL] Dropping Whisper hallucination: '{text}'")
+                    continue
+
                 # Check for empty or purely silent whisper hallucinations
                 if not text or len(text) < 2:
                     logger.info(f"Ignoring empty or noise transcript: '{text}'")
@@ -154,7 +163,21 @@ async def handle_ws_session(websocket: WebSocket, session_id: str, mgr: SessionM
                     await mgr.broadcast(session_id, EventType.SERVER_PROMPT, {"text": response})
                     continue
 
+                # ── Repeat request handling ──────────────────
+                # Catches "can you repeat that?", "sorry what?", "say again" etc.
+                # Instead of treating it as slot input (which gives "I didn't quite
+                # catch that"), we replay the current question directly.
+                if is_repeat_request(text) and not pending:
+                    if current_slot:
+                        repeat_msg = f"Of course! {get_slot_prompt(current_slot)}"
+                    else:
+                        repeat_msg = COMPLETION_MESSAGE
+                    mgr.add_transcript(session_id, "maya", repeat_msg, True)
+                    await mgr.broadcast(session_id, EventType.SERVER_PROMPT, {"text": repeat_msg})
+                    continue
+
                 # ── Conversation logic ──────────────────────
+
                 start_t = time.perf_counter()
                 if pending:
                     parsed = await parser.parse(text, pending["slot"], state)
@@ -202,14 +225,43 @@ async def handle_ws_session(websocket: WebSocket, session_id: str, mgr: SessionM
                     continue
 
                 if not current_slot:
-                    # All slots filled — check if user wants to end the session
-                    if is_end_session_intent(text):
+                    # All slots filled — parse review-stage intent
+                    review = parse_review_intent(text)
+                    intent = review["intent"]
+
+                    if intent == "proceed":
+                        ack = "Great! Let's move ahead."
+                        mgr.add_transcript(session_id, "maya", ack, True)
+                        await mgr.broadcast(session_id, EventType.SERVER_PROMPT, {"text": ack})
+                        await mgr.broadcast(session_id, "server.review.proceed", {})
+
+                    elif intent == "modify_slot":
+                        target = review["slot"]
+                        # Clear the target slot so it can be re-filled
+                        pointer = dotted_to_pointer(target)
+                        clear_ops = create_replace_patch(pointer, [])
+                        if target == "backdrop_decor.types":
+                            clear_ops += create_replace_patch("/backdrop_decor/enabled", False)
+                        new_state = mgr.apply_state_patch(session_id, clear_ops)
+                        await mgr.broadcast(session_id, EventType.SERVER_STATE_PATCH, {"ops": clear_ops, "state": new_state})
+                        mgr.set_current_slot(session_id, target)
+                        slot_msg = f"Of course! {get_slot_prompt(target)}"
+                        mgr.add_transcript(session_id, "maya", slot_msg, True)
+                        await mgr.broadcast(session_id, EventType.SERVER_PROMPT, {"text": slot_msg})
+                        await mgr.broadcast(session_id, "server.review.modify_slot", {"slot": target})
+
+                    elif intent == "modify_generic":
+                        msg = get_review_modify_prompt()
+                        mgr.add_transcript(session_id, "maya", msg, True)
+                        await mgr.broadcast(session_id, EventType.SERVER_PROMPT, {"text": msg})
+
+                    elif intent == "end":
                         mgr.add_transcript(session_id, "maya", SESSION_ENDED_MESSAGE, True)
                         await mgr.broadcast(session_id, EventType.SERVER_PROMPT, {"text": SESSION_ENDED_MESSAGE})
-                        # Signal the frontend to end the session
                         await mgr.broadcast(session_id, "server.session.ended", {})
+
                     else:
-                        # User said something else after completion — invite them again
+                        # Ambiguous — re-surface the review prompt
                         mgr.add_transcript(session_id, "maya", COMPLETION_MESSAGE, True)
                         await mgr.broadcast(session_id, EventType.SERVER_PROMPT, {"text": COMPLETION_MESSAGE})
                     continue
@@ -228,6 +280,10 @@ async def handle_ws_session(websocket: WebSocket, session_id: str, mgr: SessionM
                     await mgr.broadcast(session_id, EventType.SERVER_STATE_PATCH, {"ops": result["patch_ops"], "state": new_state})
 
                 mgr.set_current_slot(session_id, result["next_slot"])
+
+                # Notify frontend when all slots are filled
+                if result["next_slot"] is None:
+                    await mgr.broadcast(session_id, "server.slots.filled", {})
 
                 response_parts = []
                 if result["confirmation_text"]:

@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;700&amp;family=Manrope:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary-fixed-dim": "#e9c349",
+                        "outline-variant": "#4d4635",
+                        "surface-container-high": "#2a2a2a",
+                        "tertiary": "#e9c7c0",
+                        "secondary": "#ddb7ff",
+                        "on-primary-container": "#554300",
+                        "background": "#131313",
+                        "surface-container": "#201f1f",
+                        "surface-container-low": "#1c1b1b",
+                        "inverse-primary": "#735c00",
+                        "on-primary": "#3c2f00",
+                        "secondary-fixed-dim": "#ddb7ff",
+                        "secondary-container": "#622599",
+                        "surface-dim": "#131313",
+                        "tertiary-fixed-dim": "#e0bfb8",
+                        "surface-tint": "#e9c349",
+                        "on-tertiary": "#402b27",
+                        "surface": "#131313",
+                        "on-tertiary-fixed-variant": "#59413c",
+                        "on-secondary": "#4a0080",
+                        "on-surface-variant": "#d0c5af",
+                        "primary": "#f2ca50",
+                        "on-primary-fixed-variant": "#574500",
+                        "error": "#ffb4ab",
+                        "surface-container-highest": "#353534",
+                        "on-surface": "#e5e2e1",
+                        "primary-fixed": "#ffe088",
+                        "tertiary-fixed": "#fedbd4",
+                        "on-tertiary-fixed": "#291713",
+                        "inverse-surface": "#e5e2e1",
+                        "tertiary-container": "#ccaca5",
+                        "on-tertiary-container": "#57403b",
+                        "error-container": "#93000a",
+                        "outline": "#99907c",
+                        "on-secondary-fixed-variant": "#622599",
+                        "on-error-container": "#ffdad6",
+                        "surface-variant": "#353534",
+                        "on-error": "#690005",
+                        "surface-bright": "#393939",
+                        "on-primary-fixed": "#241a00",
+                        "on-secondary-fixed": "#2c0050",
+                        "surface-container-lowest": "#0e0e0e",
+                        "on-secondary-container": "#d1a1ff",
+                        "secondary-fixed": "#f0dbff",
+                        "primary-container": "#d4af37",
+                        "on-background": "#e5e2e1",
+                        "inverse-on-surface": "#313030"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "fontFamily": {
+                        "headline": ["Noto Serif"],
+                        "body": ["Manrope"],
+                        "label": ["Manrope"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Manrope', sans-serif; background-color: #131313; }
+        .noto-serif { font-family: 'Noto Serif', serif; }
+        .glass-panel { background: rgba(32, 31, 31, 0.6); backdrop-filter: blur(40px); }
+        .ambient-glow { box-shadow: 0 0 100px -20px rgba(242, 202, 80, 0.08); }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24; }
+    </style>
+</head>
+<body class="bg-background text-on-surface selection:bg-primary/30">
+<!-- TopAppBar Execution -->
+<header class="bg-neutral-950/60 backdrop-blur-xl fixed top-0 w-full z-50 flex justify-between items-center px-12 h-20 w-full shadow-[0_8px_32px_0_rgba(212,175,55,0.05)]">
+<div class="flex items-center gap-2">
+<span class="text-2xl font-bold tracking-tighter text-[#f2ca50] font-['Noto_Serif']">Maya</span>
+</div>
+<nav class="hidden md:flex items-center gap-8">
+<a class="text-neutral-400 font-medium hover:text-[#f2ca50] transition-colors duration-300 font-['Noto_Serif'] text-lg tracking-wide" href="#">Concierge</a>
+<a class="text-neutral-400 font-medium hover:text-[#f2ca50] transition-colors duration-300 font-['Noto_Serif'] text-lg tracking-wide" href="#">Timeline</a>
+<a class="text-[#f2ca50] border-b-2 border-[#f2ca50] pb-1 font-['Noto_Serif'] text-lg tracking-wide" href="#">Inspiration</a>
+</nav>
+<div class="flex items-center gap-6">
+<button class="scale-95 transition-transform text-neutral-400 hover:text-[#f2ca50]">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="scale-95 transition-transform text-neutral-400 hover:text-[#f2ca50]">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<div class="w-10 h-10 rounded-full bg-surface-container-high overflow-hidden border border-primary/20">
+<img alt="User profile" class="w-full h-full object-cover" data-alt="close-up portrait of a sophisticated person with warm lighting and a soft blurred background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAo-L1aPiQV4gqrhg0NSvBtwvJIcZEEqR0Tz8nRo2KztDZCzz3UEwsFSarS4TpWtc64spn2sDt2SDpWfXeEG8lo_lgxSPBksVXq97La8xj6VHgK4z_fhRJPFLwPBX8OKYNQMLFi-1HiZOFJB1Tu5Pn04wN8Cg8NiSHKbC01zvcWw-fAeijkbaLEAqdkm4rF4qcsphfsH35kkr7Z6_TaywB1xKrw9uPH-YjSEmTJ4VMPq1byJzZBLfx981eKp5qeW8THARU0VYEjrNI"/>
+</div>
+</div>
+</header>
+<main class="pt-32 pb-40 px-6 md:px-12 lg:px-24 min-h-screen relative overflow-hidden">
+<!-- Background Ambient Accents -->
+<div class="absolute top-1/4 -left-20 w-96 h-96 bg-secondary-container/10 rounded-full blur-[120px]"></div>
+<div class="absolute bottom-1/4 -right-20 w-96 h-96 bg-primary-container/10 rounded-full blur-[120px]"></div>
+<section class="max-w-6xl mx-auto relative z-10">
+<!-- Maya Intro Text -->
+<div class="mb-16 space-y-4 max-w-2xl">
+<h1 class="noto-serif text-4xl md:text-5xl lg:text-6xl text-on-surface leading-tight">Your vision is coming together beautifully.</h1>
+<p class="text-on-surface-variant text-lg md:text-xl font-light tracking-wide">Would you like to make any changes, or shall we proceed to visualize this in a hall?</p>
+</div>
+<!-- Bento Grid of Selections -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
+<!-- Floral Narrative - Large Highlight -->
+<div class="md:col-span-8 group">
+<div class="glass-panel ambient-glow rounded-xl overflow-hidden transition-all duration-500 hover:bg-neutral-800/40">
+<div class="relative h-72 md:h-96 overflow-hidden">
+<img alt="Floral Narrative" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="Luxurious wedding floral arrangement with heavy marigolds and white jasmines draped over traditional brass structures with soft golden hour light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAZ7Lok1TjTAYDowFSpLdE89Jg-xTN8KYyf-o5E0lK5v5w_RQmdIjexgvdlp6508F6W3Nrrt2K0yt_mZ9HVECJgH8RFp49eABRwSx0W7SFlTYR681eSeJ3CFGlou5mdxuUG2zBmDreEdv4T9Rq1Fo0Zj2wRD-bMuh6_WZ3NoNyLZpfqi4onfltgbS6qoPtbcpLQZHPMbDJl5YbCQzCnVVVc1A2d0RSDbWJ0W5dxEE-ILpz0EmA4rLi0z6z-vNdZJZ3fAA06dt-dowM"/>
+<div class="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent"></div>
+<div class="absolute bottom-6 left-8">
+<span class="bg-primary/20 backdrop-blur-md text-primary px-3 py-1 rounded-full text-xs font-bold tracking-widest uppercase mb-2 inline-block">Floral Narrative</span>
+<h3 class="noto-serif text-3xl text-white">Temple Jasmine &amp; Marigold</h3>
+</div>
+</div>
+<div class="p-8 border-t border-white/5">
+<p class="text-on-surface-variant font-light leading-relaxed">A cascading arrangement of fresh Mogra and Orange Marigolds, interlaced with gold-dipped leaves for a regal, traditional warmth.</p>
+</div>
+</div>
+</div>
+<!-- Entrance Way -->
+<div class="md:col-span-4 space-y-6">
+<div class="glass-panel ambient-glow rounded-xl overflow-hidden p-6 group transition-all duration-500 hover:bg-neutral-800/40">
+<div class="aspect-square rounded-lg overflow-hidden mb-4">
+<img alt="Entrance Way" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" data-alt="Grand palatial entrance with heavy silk drapes and ornate brass lamps lighting a path filled with rose petals" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB8Gnxund4yASOKzGuq2kj8AMJGt48l4nbhRysGRqj1Rpmcwlq9mxXTmUZjILD5Q0cwyJlAf1ECrycBPxE3grJC44tpFVPNdCnwSFNMmCZ31MGugGy3ZX9OupKl_4stBvIKEcZqdJXrukw_wzpwJaLh33eXfLAtOoPpBR9M1SgSmiGquf1b9CUHwz0ZhMnJCXt9XEwCYrlxyRFrv9LqZ4z1dHO_PhWNWGiAi90NXVQ6ZJu3OenhVP80zV8kpSu04fPh9HMdx4tXJls"/>
+</div>
+<span class="text-primary text-[10px] font-bold tracking-[0.2em] uppercase">Entrance Way</span>
+<h4 class="noto-serif text-xl mt-1">The Royal Threshold</h4>
+</div>
+<div class="glass-panel ambient-glow rounded-xl overflow-hidden p-6 group transition-all duration-500 hover:bg-neutral-800/40">
+<div class="aspect-[4/3] rounded-lg overflow-hidden mb-4">
+<img alt="Lighting Design" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" data-alt="Warm ambient lighting with countless glass votives and crystal chandeliers reflecting off polished marble floors" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBe5Ig4zoqacgID612dbEHrtH0rvnUauFANvvRoNWQlF0vPmJDDqJMgC6xPr6UKIdumRDi3GNEB4-0PljYlZ9RfvdPnOw46fP7Nqguht8cNCxOJtDWCH5v_phQeLeEN_EEP-M3VZ3Mdgr3kFXA47VwMENOOKITt8HG-qI0q-6133p6zL772dcgLATG0c8qc-2RphFzmEazwocB4YdVRo7nWKRWfWEOyiG32a9jpZ64ePAy6UD7Mr4IJeY_yd215zW0DcUUZNZqClYc"/>
+</div>
+<span class="text-primary text-[10px] font-bold tracking-[0.2em] uppercase">Lighting Design</span>
+<h4 class="noto-serif text-xl mt-1">Amber Glow Constellation</h4>
+</div>
+</div>
+<!-- Mandap Structure - Wide Bottom -->
+<div class="md:col-span-12">
+<div class="glass-panel ambient-glow rounded-xl overflow-hidden flex flex-col md:flex-row transition-all duration-500 hover:bg-neutral-800/40">
+<div class="w-full md:w-2/5 h-64 md:h-auto overflow-hidden">
+<img alt="Mandap Structure" class="w-full h-full object-cover" data-alt="Detailed view of a traditional wedding mandap with intricate wood carvings and soft pink silk canopy" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA5_1biPudjFrqiute4FU5tdZzWx6INb0mwXWCO217TOcCDlNyCvNVVhPqqHNmienHMFzqdoIFTSQp_QU8dKToxkAnUpXFxaToO_Qx11C48ktcdzuEBOzlXOnBJNUxzOmcGha7jRcUe68xfIveXnTDq_NK4o3s6FFiFv-e-gGBm4UknNuSSfjDEYQUaiGyqqrXH3eGZkKD7RBBM4m8oi2H3nb_f3mrR0Zp92D4fJ5HVlQGje3lXMD2fKPFoF-Md9oYNOJpTQ21tMIQ"/>
+</div>
+<div class="w-full md:w-3/5 p-8 md:p-12 flex flex-col justify-center">
+<span class="text-primary text-[10px] font-bold tracking-[0.2em] uppercase mb-2">Mandap Structure</span>
+<h3 class="noto-serif text-3xl mb-4">Heritage Lotus Pavilion</h3>
+<p class="text-on-surface-variant font-light mb-8 leading-relaxed">The centerpiece of your celebration. Featuring a hand-carved four-pillar structure in aged teak, crowned with a silk canopy of soft rose and gold threadwork.</p>
+<div class="flex gap-4">
+<div class="px-4 py-2 bg-white/5 rounded-full border border-white/10 text-xs text-on-surface">Teak Wood Base</div>
+<div class="px-4 py-2 bg-white/5 rounded-full border border-white/10 text-xs text-on-surface">Rose Silk Drapes</div>
+<div class="px-4 py-2 bg-white/5 rounded-full border border-white/10 text-xs text-on-surface">Gilded Accents</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Global Actions -->
+<div class="mt-20 flex flex-col md:flex-row items-center justify-center gap-6">
+<button class="w-full md:w-auto px-10 py-5 rounded-full border border-primary text-primary hover:bg-primary hover:text-on-primary transition-all duration-300 font-bold uppercase tracking-widest text-sm flex items-center justify-center gap-2 group">
+<span class="material-symbols-outlined group-hover:rotate-12 transition-transform">edit</span>
+                    Edit Selections
+                </button>
+<button class="w-full md:w-auto px-12 py-5 rounded-full bg-gradient-to-tr from-[#f2ca50] to-[#d4af37] text-neutral-950 font-bold uppercase tracking-widest text-sm shadow-[0_10px_30px_-5px_rgba(242,202,80,0.3)] hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2">
+                    Proceed to Visualization
+                    <span class="material-symbols-outlined">arrow_forward_ios</span>
+</button>
+</div>
+</section>
+</main>
+<!-- BottomNavBar Execution (Floating Type) -->
+<nav class="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 flex items-center gap-12 bg-neutral-900/80 backdrop-blur-2xl rounded-full px-8 py-4 border border-white/10 shadow-[0_20px_50px_rgba(74,0,128,0.1)]">
+<div class="flex flex-col items-center justify-center text-neutral-400 hover:text-white transition-all cursor-pointer">
+<span class="material-symbols-outlined" data-icon="mic_off">mic_off</span>
+<span class="font-['Manrope'] text-xs font-semibold mt-1">Mute</span>
+</div>
+<div class="flex flex-col items-center justify-center bg-gradient-to-tr from-[#f2ca50] to-[#d4af37] text-neutral-950 rounded-full p-4 scale-110 shadow-lg cursor-default">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-['Manrope'] text-xs font-semibold hidden md:block">Moodboard</span>
+</div>
+<div class="flex flex-col items-center justify-center text-neutral-400 hover:text-white transition-all cursor-pointer">
+<span class="material-symbols-outlined" data-icon="auto_awesome">auto_awesome</span>
+<span class="font-['Manrope'] text-xs font-semibold mt-1">Ask Maya</span>
+</div>
+<div class="flex flex-col items-center justify-center text-neutral-400 hover:text-white transition-all cursor-pointer">
+<span class="material-symbols-outlined" data-icon="call_end">call_end</span>
+<span class="font-['Manrope'] text-xs font-semibold mt-1">End Session</span>
+</div>
+</nav>
+<!-- SideNavBar Logic - Suppressed because this is a Focused Task/Review screen -->
+</body></html>

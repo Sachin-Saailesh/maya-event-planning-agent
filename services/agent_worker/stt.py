@@ -32,12 +32,17 @@ async def transcribe(
     *,
     model: str = "whisper-1",
     language: str = "en",
+    prompt: str | None = None,
     max_retries: int = 3,
     timeout: float = 30.0,
 ) -> str:
     """
     Transcribe audio bytes using OpenAI Whisper API.
     Returns transcript text. Retries on failure with exponential backoff.
+
+    Args:
+        prompt: Optional Whisper prompt to bias transcription vocabulary.
+                Dramatically reduces hallucinations on near-silence audio.
     """
     client = _get_client()
 
@@ -46,14 +51,18 @@ async def transcribe(
             audio_file = io.BytesIO(audio_bytes)
             audio_file.name = "audio.wav"
 
+            create_kwargs: dict = {
+                "model": model,
+                "file": audio_file,
+                "language": language,
+                "response_format": "text",
+            }
+            if prompt:
+                create_kwargs["prompt"] = prompt
+
             start_t = time.perf_counter()
             transcript = await asyncio.wait_for(
-                client.audio.transcriptions.create(
-                    model=model,
-                    file=audio_file,
-                    language=language,
-                    response_format="text",
-                ),
+                client.audio.transcriptions.create(**create_kwargs),
                 timeout=timeout,
             )
             duration_ms = (time.perf_counter() - start_t) * 1000

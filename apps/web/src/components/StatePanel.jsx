@@ -1,121 +1,133 @@
 import { useState, useCallback } from 'react';
+import { SLOT_CONFIG, getNestedValue } from '../slotConfig.js';
 
 /**
- * State panel with editable chips for all decoration fields.
+ * StatePanel — live decor state with editable chips.
+ * New design: gold/charcoal, ghost borders, highlights active slot.
  */
 
-const FIELD_LABELS = {
-  primary_colors: 'Primary Colours',
-  types_of_flowers: 'Flowers',
-  props: 'Props',
-  chandeliers: 'Chandeliers',
-  decor_lights: 'Decorative Lighting',
-  hall_decor: 'Hall Decoration',
-  selfie_booth_decor: 'Selfie Booth',
-};
+const TOP_LEVEL_SLOTS = [
+  "primary_colors",
+  "types_of_flowers",
+  "decor_lights",
+  "chandeliers",
+  "props",
+  "selfie_booth_decor",
+  "hall_decor",
+];
 
-const ENTRANCE_LABELS = {
-  foyer: 'Foyer',
-  garlands: 'Garlands',
-  name_board: 'Name Board',
-  top_decor_at_entrance: 'Top Decor at Entrance',
-};
+const ENTRANCE_KEYS = [
+  "entrance_decor.foyer",
+  "entrance_decor.garlands",
+  "entrance_decor.name_board",
+  "entrance_decor.top_decor_at_entrance",
+];
 
-export default function StatePanel({ state, onStateUpdate }) {
-  if (!state) return (
-    <div className="state-panel">
-      <div className="state-panel__header">Decor State</div>
-      <div className="state-panel__content">
-        <p className="state-section__empty">No session active</p>
-      </div>
-    </div>
-  );
+function slotLabel(slotKey) {
+  return SLOT_CONFIG[slotKey]?.label ?? slotKey.split(".").pop().replace(/_/g, " ");
+}
+
+export default function StatePanel({ state, currentSlot, onStateUpdate }) {
+  const isActive = (slotKey) => slotKey === currentSlot;
+
+  const getItems = (slotKey) => {
+    if (!state) return [];
+    const val = getNestedValue(state, slotKey);
+    return Array.isArray(val) ? val : val ? [String(val)] : [];
+  };
 
   return (
     <div className="state-panel">
       <div className="state-panel__header">
-        <span>Decor State</span>
-        <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Live</span>
+        <span className="state-panel__title">Decor State</span>
+        <span className="state-panel__badge">Live</span>
       </div>
-      <div className="state-panel__content">
-        {/* Top-level array fields */}
-        {Object.entries(FIELD_LABELS).map(([key, label]) => (
-          <ChipSection
-            key={key}
-            label={label}
-            items={state[key] || []}
-            slot={key}
-            onAdd={(val) => onStateUpdate('add', key, val)}
-            onRemove={(val) => onStateUpdate('remove', key, val)}
-          />
-        ))}
 
-        {/* Entrance decor */}
-        <div className="state-section">
-          <div className="state-section__title" style={{ color: 'var(--accent)', marginBottom: '0.75rem' }}>
-            Entrance Decoration
-          </div>
-          {Object.entries(ENTRANCE_LABELS).map(([key, label]) => (
+      {!state ? (
+        <div className="state-panel__content">
+          <p className="state-section__empty">Waiting for session…</p>
+        </div>
+      ) : (
+        <div className="state-panel__content">
+          {/* Top-level array slots */}
+          {TOP_LEVEL_SLOTS.map(slotKey => (
             <ChipSection
-              key={`entrance_${key}`}
-              label={label}
-              items={state.entrance_decor?.[key] || []}
-              slot={`entrance_decor.${key}`}
-              onAdd={(val) => onStateUpdate('add', `entrance_decor.${key}`, val)}
-              onRemove={(val) => onStateUpdate('remove', `entrance_decor.${key}`, val)}
-              nested
+              key={slotKey}
+              label={slotLabel(slotKey)}
+              items={getItems(slotKey)}
+              active={isActive(slotKey)}
+              onAdd={v => onStateUpdate('add', slotKey, v)}
+              onRemove={v => onStateUpdate('remove', slotKey, v)}
             />
           ))}
-        </div>
 
-        {/* Backdrop */}
-        <div className="state-section">
-          <div className="state-section__title" style={{ color: 'var(--accent)' }}>
-            Backdrop
+          {/* Entrance decor group */}
+          <div className="state-section">
+            <div
+              className="state-section__title"
+              style={{ color: 'var(--primary)', marginBottom: 'var(--space-3)' }}
+            >
+              Entrance
+            </div>
+            {ENTRANCE_KEYS.map(slotKey => (
+              <ChipSection
+                key={slotKey}
+                label={slotLabel(slotKey)}
+                items={getItems(slotKey)}
+                active={isActive(slotKey)}
+                nested
+                onAdd={v => onStateUpdate('add', slotKey, v)}
+                onRemove={v => onStateUpdate('remove', slotKey, v)}
+              />
+            ))}
           </div>
-          <div style={{ marginBottom: '0.5rem' }}>
-            <span className={`chip ${state.backdrop_decor?.enabled ? 'chip--active' : ''}`}>
-              {state.backdrop_decor?.enabled ? '✓ Enabled' : '✗ Disabled'}
-            </span>
+
+          {/* Backdrop */}
+          <div className="state-section">
+            <div
+              className={`state-section__title ${isActive('backdrop_decor.types') ? 'state-section--active' : ''}`}
+              style={{ color: isActive('backdrop_decor.types') ? 'var(--primary)' : undefined }}
+            >
+              Backdrop
+              {state.backdrop_decor?.enabled && (
+                <span style={{ marginLeft: 8, color: 'var(--success)', fontSize: '0.6rem' }}>✓</span>
+              )}
+            </div>
+            <ChipSection
+              label=""
+              items={getItems('backdrop_decor.types')}
+              active={isActive('backdrop_decor.types')}
+              nested
+              onAdd={v => onStateUpdate('add', 'backdrop_decor.types', v)}
+              onRemove={v => onStateUpdate('remove', 'backdrop_decor.types', v)}
+            />
           </div>
-          <ChipSection
-            label="Types"
-            items={state.backdrop_decor?.types || []}
-            slot="backdrop_decor.types"
-            onAdd={(val) => onStateUpdate('add', 'backdrop_decor.types', val)}
-            onRemove={(val) => onStateUpdate('remove', 'backdrop_decor.types', val)}
-            nested
-          />
         </div>
-      </div>
+      )}
     </div>
   );
 }
 
-
-function ChipSection({ label, items, slot, onAdd, onRemove, nested = false }) {
+function ChipSection({ label, items, active, nested, onAdd, onRemove }) {
   const [inputValue, setInputValue] = useState('');
 
   const handleAdd = useCallback(() => {
-    const val = inputValue.trim();
-    if (val) {
-      onAdd(val);
-      setInputValue('');
-    }
+    const v = inputValue.trim();
+    if (v) { onAdd(v); setInputValue(''); }
   }, [inputValue, onAdd]);
 
-  const handleKeyDown = useCallback((e) => {
-    if (e.key === 'Enter') {
-      handleAdd();
-    }
+  const handleKey = useCallback((e) => {
+    if (e.key === 'Enter') handleAdd();
   }, [handleAdd]);
 
   return (
-    <div className="state-section" style={nested ? { marginLeft: '0.75rem', marginBottom: '0.75rem' } : {}}>
-      <div className="state-section__title">{label}</div>
+    <div
+      className={`state-section${active ? ' state-section--active' : ''}${nested ? ' state-section--nested' : ''}`}
+    >
+      {label && <div className="state-section__title">{label}</div>}
       <div className="state-section__chips">
         {items.map((item, i) => (
-          <span key={`${item}-${i}`} className="chip chip--active">
+          <span key={`${item}-${i}`} className={`chip${active ? ' chip--gold' : ''}`}>
             {item}
             <button
               className="chip__remove"
@@ -126,12 +138,15 @@ function ChipSection({ label, items, slot, onAdd, onRemove, nested = false }) {
             </button>
           </span>
         ))}
+        {items.length === 0 && !active && (
+          <span className="state-section__empty">—</span>
+        )}
         <span className="chip-add">
           <input
             type="text"
             value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            onKeyDown={handleKeyDown}
+            onChange={e => setInputValue(e.target.value)}
+            onKeyDown={handleKey}
             placeholder="+ add"
           />
         </span>

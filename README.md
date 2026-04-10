@@ -102,7 +102,7 @@ cd infra && docker compose up -d
 
 ```bash
 cd services/orchestrator
-python -m uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+python3 -m uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
 **Terminal 2 — Frontend:**
@@ -116,7 +116,7 @@ npm run dev
 
 ```bash
 cd services/agent_worker
-python worker.py <session-id>
+python3 worker.py <session-id>
 ```
 
 ### 4. Open Browser
