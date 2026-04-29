@@ -1,0 +1,106 @@
+INFO:     Started server process [56307]
+INFO:     Waiting for application startup.
+Failed to create tables: [Errno 61] Connection refused
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     127.0.0.1:60117 - "POST /session HTTP/1.1" 200 OK
+INFO:     ('127.0.0.1', 60123) - "WebSocket /ws/session/3e10aa3a-d66a-481e-85bd-415249da14e9" [accepted]
+INFO:     connection open
+INFO:     127.0.0.1:60129 - "GET /tts?text=Vanakkam! HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60130 - "GET /tts?text=I%27m%20Maya%2C%20your%20personal%20South%20Indian%20wedding%20d%C3%A9cor%20concierge. HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60132 - "GET /tts?text=Every%20detail%20we%20plan%20together%20will%20be%20a%20reflection%20of%20your%20taste%20and%20vision. HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60133 - "GET /tts?text=Let%20us%20begin%20%E2%80%94%20what%20primary%20colours%20are%20you%20dreaming%20of%20for%20the%20hall%3F HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60131 - "GET /tts?text=It%20is%20my%20absolute%20honour%20to%20help%20you%20design%20something%20truly%20beautiful%20and%20unforgettable%20today. HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60167 - "GET /tts?text=Which%20varieties%20would%20you%20love%20%E2%80%94%20jasmine%2C%20roses%2C%20marigolds%2C%20lilies%2C%20orchids%2C%20or%20a%20mix%20of%20several%3F HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60165 - "GET /tts?text=A%20beautiful%20palette%20%E2%80%94%20gold%20will%20be%20woven%20through%20every%20element%20to%20create%20a%20cohesive%2C%20stunning%20look! HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60166 - "GET /tts?text=Fresh%20flowers%20are%20inseparable%20from%20South%20Indian%20weddings. HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60187 - "GET /tts?text=Stunning%20choice! HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60189 - "GET /tts?text=A%20floral%20canopy%2C%20hanging%20torans%2C%20ornate%20pillar%20arrangement%20%E2%80%94%20what%20style%20of%20welcome%20feels%20right%20for%20your%20celebration%3F HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60188 - "GET /tts?text=Let%27s%20design%20the%20entrance%20foyer. HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60186 - "GET /tts?text=Roses%20add%20a%20classic%20romantic%20touch%20that%20never%20fails%20to%20move%20people. HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60231 - "GET /tts?text=Let%27s%20design%20the%20entrance%20foyer. HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60232 - "GET /tts?text=A%20floral%20canopy%2C%20hanging%20torans%2C%20ornate%20pillar%20arrangement%20%E2%80%94%20what%20style%20of%20welcome%20feels%20right%20for%20your%20celebration%3F HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60230 - "GET /tts?text=Are%20you%20still%20there%3F HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60248 - "GET /tts?text=Wonderful%20%E2%80%94%20Trad. HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60251 - "GET /tts?text=Jasmine%2C%20marigold%2C%20rose%20petals%20%E2%80%94%20what%20feels%20right%20for%20your%20celebration%3F HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60249 - "GET /tts?text=Pillars%20at%20the%20foyer%20will%20set%20a%20warm%2C%20magnificent%20first%20impression%20your%20guests%20will%20never%20forget! HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60250 - "GET /tts?text=Should%20we%20adorn%20the%20entrance%20doors%20with%20garlands%3F HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60261 - "GET /tts?text=Name%20boards%20add%20such%20a%20lovely%20personal%20touch. HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60262 - "GET /tts?text=Would%20you%20like%20one%20at%20the%20entrance%20to%20welcome%20your%20guests%20with%20warmth%3F HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60260 - "GET /tts?text=Beautiful%20%E2%80%94%20marigold%20garlands%20framing%20the%20entrance%20will%20carry%20that%20deep%20sense%20of%20South%20Indian%20tradition%20and%20welcome! HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60269 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60295 - "GET /tts?text=Are%20you%20still%20there%3F HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60296 - "GET /tts?text=A%20personalised%20name%20board%20makes%20every%20guest%20feel%20truly%20honoured%20the%20moment%20they%20arrive. HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60297 - "GET /tts?text=Shall%20we%20include%20a%20beautifully%20crafted%20welcome%20board%20at%20the%20entrance%3F HTTP/1.1" 200 OK
+INFO:     connection closed
+INFO:     127.0.0.1:60718 - "POST /session HTTP/1.1" 200 OK
+INFO:     ('127.0.0.1', 60721) - "WebSocket /ws/session/de4f24e7-13c0-47ab-9ae0-b1bddb51c02f" [accepted]
+INFO:     connection open
+INFO:     127.0.0.1:60722 - "GET /tts?text=Vanakkam! HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60723 - "GET /tts?text=I%27m%20Maya%2C%20your%20personal%20South%20Indian%20wedding%20d%C3%A9cor%20concierge. HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60724 - "GET /tts?text=It%20is%20my%20absolute%20honour%20to%20help%20you%20design%20something%20truly%20beautiful%20and%20unforgettable%20today. HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60725 - "GET /tts?text=Every%20detail%20we%20plan%20together%20will%20be%20a%20reflection%20of%20your%20taste%20and%20vision. HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60726 - "GET /tts?text=Let%20us%20begin%20%E2%80%94%20what%20primary%20colours%20are%20you%20dreaming%20of%20for%20the%20hall%3F HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60743 - "GET /tts?text=Fresh%20flowers%20are%20inseparable%20from%20South%20Indian%20weddings. HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60744 - "GET /tts?text=Which%20varieties%20would%20you%20love%20%E2%80%94%20jasmine%2C%20roses%2C%20marigolds%2C%20lilies%2C%20orchids%2C%20or%20a%20mix%20of%20several%3F HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60742 - "GET /tts?text=A%20beautiful%20palette%20%E2%80%94%20Emerald%20will%20be%20woven%20through%20every%20element%20to%20create%20a%20cohesive%2C%20stunning%20look! HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60754 - "GET /tts?text=The%20foyer%20is%20where%20the%20magic%20begins%20for%20your%20guests. HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60755 - "GET /tts?text=What%20kind%20of%20decoration%20would%20you%20love%20them%20to%20walk%20into%20first%3F HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60753 - "GET /tts?text=Mogra%20will%20bring%20the%20hall%20to%20life%20with%20colour%2C%20fragrance%2C%20and%20natural%20beauty! HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60770 - "GET /tts?text=Wonderful%20%E2%80%94%20Floral%20Arch%20at%20the%20foyer%20will%20set%20a%20warm%2C%20magnificent%20first%20impression%20your%20guests%20will%20never%20forget! HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60771 - "GET /tts?text=Garlands%20at%20the%20entrance%20bring%20such%20warmth%20and%20tradition. HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60772 - "GET /tts?text=Would%20you%20like%20fresh%20flower%20garlands%20%E2%80%94%20jasmine%20strings%2C%20marigold%20chains%20%E2%80%94%20or%20mango-leaf%20torans%2C%20or%20perhaps%20both%3F HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60784 - "GET /tts?text=A%20personalised%20name%20board%20makes%20every%20guest%20feel%20truly%20honoured%20the%20moment%20they%20arrive. HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60785 - "GET /tts?text=Shall%20we%20include%20a%20beautifully%20crafted%20welcome%20board%20at%20the%20entrance%3F HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60783 - "GET /tts?text=Beautiful%20%E2%80%94%20Mixed%20Floral%20garlands%20framing%20the%20entrance%20will%20carry%20that%20deep%20sense%20of%20South%20Indian%20tradition%20and%20welcome! HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60796 - "GET /tts?text=Wonderful%20%E2%80%94%20the%20entrance%20is%20completely%20planned! HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60792 - "GET /tts?text=Lovely! HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60799 - "GET /tts?text=A%20floral%20canopy%2C%20fabric%20swags%2C%20or%20hanging%20d%C3%A9cor%20%E2%80%94%20what%20would%20you%20love%3F HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60797 - "GET /tts?text=Now%20let%27s%20design%20the%20stage. HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60798 - "GET /tts?text=Let%27s%20finish%20the%20entrance%20with%20something%20stunning%20overhead. HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60795 - "GET /tts?text=A%20personalised%20name%20board%20will%20make%20every%20guest%20feel%20truly%20honoured%20from%20the%20very%20first%20moment%20they%20arrive. HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60829 - "GET /tts?text=Now%20for%20the%20centrepiece%20of%20the%20stage%20%E2%80%94%20your%20backdrop. HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60827 - "GET /tts?text=We%27re%20halfway%20through%20and%20it%27s%20looking%20absolutely%20spectacular! HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60830 - "GET /tts?text=This%20frames%20every%20precious%20photograph%20of%20the%20day. HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60828 - "GET /tts?text=On%20to%20the%20all-important%20backdrop. HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60831 - "GET /tts?text=Would%20you%20prefer%20a%20lush%20floral%20wall%2C%20an%20intricate%20patterned%20backdrop%2C%20or%20the%20romance%20of%20a%20flower-and-lights%20combination%3F HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60826 - "GET /tts?text=Stunning%20%E2%80%94%20Floral%20Canopy%20overhead%20will%20give%20the%20entrance%20such%20dramatic%2C%20unforgettable%20impact! HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60843 - "GET /tts?text=Those%20backdrop%20types%20aren%27t%20available. HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60844 - "GET /tts?text=You%20can%20choose%20from%3A%20flowers%2C%20pattern%2C%20or%20flower%20lights%20%E2%80%94%20which%20would%20you%20love%3F HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60855 - "GET /tts?text=The%20right%20lighting%20makes%20everything%20glow. HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60853 - "GET /tts?text=An%20intricate%20patterned%20backdrop%20gives%20such%20a%20refined%2C%20artisanal%20quality%20to%20the%20stage. HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60854 - "GET /tts?text=Beautiful%20choice! HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60856 - "GET /tts?text=What%20decorative%20lights%20would%20set%20your%20perfect%20mood%20%E2%80%94%20warm%20white%20strings%2C%20tea%20lights%2C%20neon%20accents%2C%20or%20hanging%20lantern%20clusters%3F HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60866 - "GET /tts?text=Paper%20lanterns%20cast%20the%20most%20romantic%2C%20warm%20glow%20%E2%80%94%20guests%20will%20be%20enchanted%20by%20the%20atmosphere! HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60867 - "GET /tts?text=The%20grand%20elements%20are%20beautifully%20set%20%E2%80%94%20just%20the%20final%20details%20to%20weave%20in%20now. HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60868 - "GET /tts?text=Imagine%20guests%20looking%20up%20at%20a%20stunning%20chandelier%20as%20they%20enter. HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60869 - "GET /tts?text=Crystal%2C%20floral%2C%20or%20brass%20%E2%80%94%20which%20style%20would%20you%20love%20to%20see%3F HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60880 - "GET /tts?text=What%20would%20you%20love%20to%20see%20placed%20around%20the%20hall%3F HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60879 - "GET /tts?text=Let%27s%20add%20some%20cultural%20soul%20with%20props%20%E2%80%94%20a%20brass%20lamp%20here%2C%20banana%20plants%20there%2C%20an%20uruli%20filled%20with%20petals. HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60878 - "GET /tts?text=A%20brass%20is%20going%20to%20be%20a%20show-stopping%20focal%20point%20above%20the%20celebrations! HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60890 - "GET /tts?text=Almost%20there%20%E2%80%94%20just%20the%20last%20flourishes%20to%20make%20it%20perfect! HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60889 - "GET /tts?text=Banana%20plants%20will%20add%20such%20rich%20cultural%20depth%20and%20meaning%20to%20the%20celebration! HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60891 - "GET /tts?text=Every%20celebration%20deserves%20a%20beautiful%20memory%20corner! HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60892 - "GET /tts?text=Would%20you%20like%20a%20selfie%20booth%20for%20your%20guests%20%E2%80%94%20perhaps%20framed%20in%20fresh%20flowers%2C%20fairy%20lights%2C%20or%20a%20personalised%20themed%20backdrop%3F HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60912 - "GET /tts?text=Let%27s%20make%20it%20extraordinary. HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60911 - "GET /tts?text=We%27re%20at%20the%20very%20final%20touch. HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60910 - "GET /tts?text=Those%20photographs%20will%20be%20treasured%20forever! HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60914 - "GET /tts?text=Centrepieces%2C%20pillar%20d%C3%A9cor%2C%20table%20runners%2C%20or%20ceiling%20installations%20%E2%80%94%20what%20extra%20magic%20shall%20we%20weave%20in%3F HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60913 - "GET /tts?text=Last%20but%20never%20least%20%E2%80%94%20the%20hall%27s%20finishing%20details. HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60909 - "GET /tts?text=Perfect%20%E2%80%94%20your%20guests%20are%20going%20to%20absolutely%20love%20having%20a%20beautiful%20memory%20corner. HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60931 - "GET /tts?text=Here%20is%20everything%20we%27ve%20crafted%20together. HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60932 - "GET /tts?text=Would%20you%20like%20to%20refine%20any%20detail%20%E2%80%94%20colours%2C%20flowers%2C%20the%20backdrop%20%E2%80%94%20or%20are%20you%20ready%20to%20see%20this%20come%20alive%20in%20your%20chosen%20hall%3F HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60929 - "GET /tts?text=Ceiling%20drapes%20%E2%80%94%20the%20finishing%20flourishes%20that%20will%20tie%20every%20element%20of%20your%20hall%20together%20beautifully! HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60930 - "GET /tts?text=Your%20d%C3%A9cor%20vision%20is%20looking%20absolutely%20stunning! HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60942 - "POST /generate HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60971 - "GET /tts?text=Of%20course! HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60972 - "GET /tts?text=The%20first%20brushstroke%20of%20your%20d%C3%A9cor%20story%20%E2%80%94%20what%20primary%20colours%20would%20you%20like%20to%20weave%20through%20every%20corner%20of%20the%20hall%3F HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60995 - "GET /tts?text=Are%20you%20still%20there%3F HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60996 - "GET /tts?text=Let%27s%20begin%20with%20the%20soul%20of%20your%20celebration%20%E2%80%94%20what%20colours%20are%20you%20dreaming%20of%20for%20the%20hall%3F HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60997 - "GET /tts?text=Gold%20and%20maroon%20are%20timeless%20South%20Indian%20royalty%2C%20ivory%20and%20rose%20gold%20are%20endlessly%20romantic%2C%20or%20tell%20me%20your%20own%20unique%20vision. HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61015 - "GET /tts?text=Your%20d%C3%A9cor%20vision%20is%20looking%20absolutely%20stunning! HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61016 - "GET /tts?text=Here%20is%20everything%20we%27ve%20crafted%20together. HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61017 - "GET /tts?text=Would%20you%20like%20to%20refine%20any%20detail%20%E2%80%94%20colours%2C%20flowers%2C%20the%20backdrop%20%E2%80%94%20or%20are%20you%20ready%20to%20see%20this%20come%20alive%20in%20your%20chosen%20hall%3F HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61014 - "GET /tts?text=Regal%20and%20enchanting%20%E2%80%94%20maroon%20and%20purple%20will%20give%20the%20celebration%20a%20truly%20majestic%20feel! HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61023 - "POST /generate HTTP/1.1" 200 OK
+INFO:     connection closed

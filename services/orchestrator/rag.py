@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import logging
 import os
-from typing import Any, Optional
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -90,3 +90,49 @@ class RAGMemory:
             speaker = "User" if turn.get("speaker") == "user" else "Maya"
             text = f"{speaker}: {turn.get('text', '')}"
             self.embed_and_store(session_id, text, start_index + i)
+
+    def semantic_search_with_fallback(
+        self,
+        session_id: str,
+        query: str,
+        transcript: list[dict[str, Any]],
+        top_k: int = 3,
+    ) -> str:
+        """
+        Cosine-similarity search over stored turns (ChromaDB).
+        Falls back to a sliding window of the last 6 transcript turns when:
+          - ChromaDB is disabled / unavailable
+          - No result passes the distance threshold (< 0.7)
+
+        Returns a formatted context string ready to inject into an LLM prompt.
+        Returns empty string if nothing is available.
+        """
+        if self._enabled:
+            try:
+                results = self._collection.query(
+                    query_texts=[query],
+                    n_results=top_k,
+                    where={"session_id": session_id},
+                )
+                if results and results.get("documents") and results.get("distances"):
+                    docs = results["documents"][0]
+                    dists = results["distances"][0]
+                    # cosine space: distance 0 = identical, 1 = orthogonal
+                    relevant = [
+                        doc for doc, dist in zip(docs, dists)
+                        if dist < 0.7
+                    ]
+                    if relevant:
+                        return "Relevant conversation context:\n" + "\n".join(relevant)
+            except Exception as exc:
+                logger.warning("RAG cosine search failed, using sliding-window fallback: %s", exc)
+
+        # Sliding-window fallback — last 6 turns from in-memory transcript
+        recent = transcript[-6:] if len(transcript) > 6 else transcript
+        if not recent:
+            return ""
+        lines = []
+        for turn in recent:
+            speaker = "User" if turn.get("speaker") == "user" else "Maya"
+            lines.append(f"{speaker}: {turn.get('text', '')}")
+        return "Recent conversation:\n" + "\n".join(lines)

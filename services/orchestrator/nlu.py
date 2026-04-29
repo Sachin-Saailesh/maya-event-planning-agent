@@ -134,7 +134,7 @@ class NLUParser(ABC):
     """Interface for NLU parsers."""
 
     @abstractmethod
-    async def parse(self, text: str, current_slot: str, state: dict[str, Any]) -> dict[str, Any]:
+    async def parse(self, text: str, current_slot: str, state: dict[str, Any], context: str = "") -> dict[str, Any]:
         """
         Parse user text and return extraction result.
         Returns: {
@@ -142,6 +142,7 @@ class NLUParser(ABC):
             "intent": str,   # "add"|"remove"|"replace"|"set"|"confirm"|"deny"|"greeting"|"unknown"
             "raw_text": str,
         }
+        context: optional RAG / sliding-window transcript context (LLM backend only).
         """
         ...
 
@@ -151,7 +152,7 @@ class NLUParser(ABC):
 class RuleBasedParser(NLUParser):
     """Keyword + synonym matching NLU, context-first."""
 
-    async def parse(self, text: str, current_slot: str, state: dict[str, Any]) -> dict[str, Any]:
+    async def parse(self, text: str, current_slot: str, state: dict[str, Any], _context: str = "") -> dict[str, Any]:
         text_lower = text.lower().strip()
 
         # Domain guard — reject implausible ASR garbage
@@ -313,9 +314,14 @@ class LLMParser(NLUParser):
             from openai import AsyncOpenAI
             self.client = AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-    async def parse(self, text: str, current_slot: str, state: dict[str, Any]) -> dict[str, Any]:
+    async def parse(self, text: str, current_slot: str, state: dict[str, Any], context: str = "") -> dict[str, Any]:
         if not self.enabled:
             raise RuntimeError("LLM parser is disabled. Set NLU_BACKEND=llm to enable.")
+
+        context_block = (
+            f"\n\nConversation context (for reference — do not override the user's explicit answer):\n{context}"
+            if context else ""
+        )
 
         prompt = f"""You are an NLU engine for a South Indian wedding decoration planner.
 Extract the decoration preferences from the user's text.
@@ -344,8 +350,7 @@ Rules:
    - "acknowledgment" if they just say "perfect", "great", "awesome" without new details.
 6. Use slot context: if current slot is "backdrop_decor.types", map "lights" -> "flower_lights".
 7. If the user explicitly mentions colors, slot MUST be "primary_colors".
-   If the user explicitly mentions flowers, slot MUST be "types_of_flowers".
-"""
+   If the user explicitly mentions flowers, slot MUST be "types_of_flowers".{context_block}"""
 
         try:
             import json

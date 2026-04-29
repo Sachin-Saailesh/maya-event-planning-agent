@@ -4,9 +4,11 @@ REST + WebSocket endpoints for session management and real-time voice interactio
 """
 from __future__ import annotations
 
+import hashlib
 import os
 import uuid
 import logging
+from collections import OrderedDict
 from contextlib import asynccontextmanager
 
 from dotenv import load_dotenv
@@ -20,6 +22,54 @@ from ws_handler import handle_ws_session
 from conversation import generate_summary_text
 
 logger = logging.getLogger(__name__)
+
+# ── In-process TTS LRU cache ──────────────────────────────────────
+# Avoids re-calling OpenAI for identical phrases (greetings, slot prompts).
+_TTS_CACHE_MAX = 200
+_tts_cache: OrderedDict[str, bytes] = OrderedDict()
+
+
+def _tts_cache_get(text: str) -> bytes | None:
+    key = hashlib.sha256(text.encode()).hexdigest()
+    entry = _tts_cache.get(key)
+    if entry is None:
+        return None
+    _tts_cache.move_to_end(key)
+    return entry
+
+
+def _tts_cache_put(text: str, audio: bytes) -> None:
+    key = hashlib.sha256(text.encode()).hexdigest()
+    _tts_cache[key] = audio
+    _tts_cache.move_to_end(key)
+    while len(_tts_cache) > _TTS_CACHE_MAX:
+        _tts_cache.popitem(last=False)
+
+
+async def _prewarm_tts():
+    """Pre-warm TTS cache for the greeting and first slot prompt at startup."""
+    if not os.getenv("OPENAI_API_KEY"):
+        return
+    try:
+        from openai import AsyncOpenAI
+        from conversation import get_greeting, get_slot_prompt
+        from maya_schema.state import SLOT_PRIORITY
+
+        client = AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+        phrases = [get_greeting()]
+        if SLOT_PRIORITY:
+            phrases.append(get_slot_prompt(SLOT_PRIORITY[0]))
+
+        for phrase in phrases:
+            if _tts_cache_get(phrase):
+                continue
+            resp = await client.audio.speech.create(
+                model="tts-1", voice="nova", input=phrase, response_format="mp3"
+            )
+            _tts_cache_put(phrase, resp.content)
+            logger.info("[TTS_CACHE] pre-warmed %d chars", len(phrase))
+    except Exception as e:
+        logger.warning("[TTS_CACHE] pre-warm failed: %s", e)
 
 
 @asynccontextmanager
@@ -61,6 +111,19 @@ async def lifespan(app: FastAPI):
         app.state.rag = rag if rag.enabled else None
     except Exception as e:
         app.state.rag = None
+
+    # Initialize NLU semantic cache (used when NLU_BACKEND=llm)
+    try:
+        from semantic_cache import SemanticCache
+        app.state.semantic_cache = SemanticCache()
+        logger.info("SemanticCache initialized (max=512, ttl=3600s)")
+    except Exception as e:
+        logger.info(f"SemanticCache not available: {e}")
+        app.state.semantic_cache = None
+
+    # Pre-warm TTS cache for high-frequency phrases (non-blocking)
+    import asyncio
+    asyncio.create_task(_prewarm_tts())
 
     yield
 
@@ -183,21 +246,25 @@ async def text_to_speech(text: str):
     Convert text to speech using OpenAI TTS.
     Returns audio/mpeg bytes — played by HTMLAudioElement
     which is immune to the macOS WebRTC/speechSynthesis hardware mutex.
+    Responses are cached in-process to avoid redundant API calls.
     """
-    from openai import AsyncOpenAI
     from fastapi.responses import Response
 
-    client = AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+    cached = _tts_cache_get(text)
+    if cached:
+        logger.debug("[TTS_CACHE] hit len=%d", len(text))
+        return Response(content=cached, media_type="audio/mpeg", headers={"Cache-Control": "no-cache"})
 
+    from openai import AsyncOpenAI
+    client = AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY"))
     response = await client.audio.speech.create(
         model="tts-1",
         voice="nova",
         input=text,
         response_format="mp3",
     )
-
-    # .content gives the raw MP3 bytes directly
     audio_bytes = response.content
+    _tts_cache_put(text, audio_bytes)
 
     return Response(
         content=audio_bytes,
@@ -423,6 +490,10 @@ async def ws_session(websocket: WebSocket, session_id: str):
         return
     await websocket.accept()
     try:
-        await handle_ws_session(websocket, session_id, mgr)
+        await handle_ws_session(
+            websocket, session_id, mgr,
+            rag=getattr(app.state, "rag", None),
+            cache=getattr(app.state, "semantic_cache", None),
+        )
     except WebSocketDisconnect:
         pass

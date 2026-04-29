@@ -36,7 +36,7 @@ from conversation import (
     parse_review_intent,
     get_review_modify_prompt,
 )
-from nlu import get_parser
+from nlu import get_parser, LLMParser
 from guardrails import check_input, check_output, get_guardrail_message
 from memory import should_compress, compress_transcript, get_recent_turns
 from tools import detect_tool_intent, execute_tool
@@ -44,9 +44,17 @@ from tools import detect_tool_intent, execute_tool
 logger = logging.getLogger(__name__)
 
 
-async def handle_ws_session(websocket: WebSocket, session_id: str, mgr: SessionManager):
+async def handle_ws_session(
+    websocket: WebSocket,
+    session_id: str,
+    mgr: SessionManager,
+    *,
+    rag=None,
+    cache=None,
+):
     """Main WebSocket event loop for a planning session."""
     parser = get_parser()
+    _is_llm_backend = isinstance(parser, LLMParser)
 
     mgr.add_connection(session_id, websocket)
 
@@ -180,7 +188,13 @@ async def handle_ws_session(websocket: WebSocket, session_id: str, mgr: SessionM
 
                 start_t = time.perf_counter()
                 if pending:
-                    parsed = await parser.parse(text, pending["slot"], state)
+                    if _is_llm_backend and cache is not None:
+                        parsed = cache.get(pending["slot"], text)
+                        if parsed is None:
+                            parsed = await parser.parse(text, pending["slot"], state)
+                            cache.put(pending["slot"], text, parsed)
+                    else:
+                        parsed = await parser.parse(text, pending["slot"], state)
                     intent = parsed["intent"]
                     if intent in ("confirm", "set"):
                         intent = "add"
@@ -220,8 +234,12 @@ async def handle_ws_session(websocket: WebSocket, session_id: str, mgr: SessionM
                     duration_ms = (time.perf_counter() - start_t) * 1000
                     logger.info(f"[METRICS] Orchestrator Turn (Confirm) duration: {duration_ms:.1f}ms")
 
-                    # Background memory compression
+                    # Background memory compression + RAG embedding
                     asyncio.create_task(_maybe_compress_memory(session_id, mgr))
+                    if rag is not None:
+                        asyncio.create_task(_embed_turns_background(
+                            rag, session_id, text, response, mgr.get_turn_count(session_id)
+                        ))
                     continue
 
                 if not current_slot:
@@ -266,7 +284,22 @@ async def handle_ws_session(websocket: WebSocket, session_id: str, mgr: SessionM
                         await mgr.broadcast(session_id, EventType.SERVER_PROMPT, {"text": COMPLETION_MESSAGE})
                     continue
 
-                parsed = await parser.parse(text, current_slot, state)
+                # RAG context retrieval (LLM backend only — rule-based is fast enough without it)
+                _nlu_context = ""
+                if _is_llm_backend and rag is not None:
+                    _turn_transcript = mgr.get_session(session_id)["transcript"]
+                    _nlu_context = rag.semantic_search_with_fallback(
+                        session_id, text, _turn_transcript
+                    )
+
+                # Cache-aware NLU parse
+                if _is_llm_backend and cache is not None:
+                    parsed = cache.get(current_slot, text)
+                    if parsed is None:
+                        parsed = await parser.parse(text, current_slot, state, _nlu_context)
+                        cache.put(current_slot, text, parsed)
+                else:
+                    parsed = await parser.parse(text, current_slot, state)
                 result = process_user_input(text, current_slot, parsed, state)
 
                 if result["needs_confirmation"]:
@@ -278,6 +311,11 @@ async def handle_ws_session(websocket: WebSocket, session_id: str, mgr: SessionM
                 if result["patch_ops"]:
                     new_state = mgr.apply_state_patch(session_id, result["patch_ops"])
                     await mgr.broadcast(session_id, EventType.SERVER_STATE_PATCH, {"ops": result["patch_ops"], "state": new_state})
+                    logger.info("[METRICS] slot_fill_success slot=%s values=%s intent=%s",
+                                current_slot, parsed.get("values", []), parsed.get("intent", "unknown"))
+                else:
+                    logger.info("[METRICS] slot_fill_miss slot=%s intent=%s text=%r",
+                                current_slot, parsed.get("intent", "unknown"), text[:60])
 
                 mgr.set_current_slot(session_id, result["next_slot"])
 
@@ -301,8 +339,12 @@ async def handle_ws_session(websocket: WebSocket, session_id: str, mgr: SessionM
                     duration_ms = (time.perf_counter() - start_t) * 1000
                     logger.info(f"[METRICS] Orchestrator Turn (Process) duration: {duration_ms:.1f}ms")
 
-                # Background memory compression
+                # Background memory compression + RAG embedding
                 asyncio.create_task(_maybe_compress_memory(session_id, mgr))
+                if rag is not None:
+                    asyncio.create_task(_embed_turns_background(
+                        rag, session_id, text, response, mgr.get_turn_count(session_id)
+                    ))
 
             elif event_type == EventType.CLIENT_STATE_UPDATE:
                 op = payload.get("op")
@@ -339,6 +381,18 @@ async def handle_ws_session(websocket: WebSocket, session_id: str, mgr: SessionM
 
     finally:
         mgr.remove_connection(session_id, websocket)
+
+
+async def _embed_turns_background(rag, session_id: str, user_text: str, maya_text: str, turn_idx: int):
+    """Background task to embed a user+Maya turn pair into the RAG vector store."""
+    try:
+        loop = asyncio.get_event_loop()
+        turns = [{"speaker": "user", "text": user_text}]
+        if maya_text:
+            turns.append({"speaker": "maya", "text": maya_text})
+        await loop.run_in_executor(None, rag.embed_turns, session_id, turns, turn_idx * 2)
+    except Exception as e:
+        logger.error(f"RAG embed background failed: {e}")
 
 
 async def _maybe_compress_memory(session_id: str, mgr: SessionManager):
